@@ -13,4 +13,4 @@ An Open Source Player for WebChimera.js (libvlc binding for node.js/io.js/NW.js/
 
 **Notes:**
 
-Usage example can be seen in ``index.html``, for the current experimental version the ``/player/`` folder needs to be in the root path of your app.
+Usage example can be seen in ``index.html``, for the current experimental version the ``/player`` folder needs to be in the root path of your app.
