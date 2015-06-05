@@ -6,6 +6,7 @@
     "main": "app://host/index.html",
     "dependencies": {
         "bindings": "~1.2.1",
+        "jquery": "*",
         "webchimera.js": "*"
     },
     "env": "development"
