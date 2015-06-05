@@ -1,0 +1,10 @@
+{
+    "name": "WebChimera.js Player Demo",
+    "version": "0.0.1",
+    "private": true,
+    "main": "app://host/index.html",
+    "dependencies": {
+        "bindings": "~1.2.1"
+    },
+    "env": "development"
+}

@@ -1,0 +1,17 @@
+<html>
+<head>
+<style>
+body,html{ width: 100%; height: 100%; padding: 0px; margin:0px }
+#player_wrapper { width: 100%; height: 100% }
+</style>
+<script src="player/wcp.js"></script>
+</head>
+<body>
+<div id="player_wrapper"></div>
+<script>
+wjs("#player_wrapper").addPlayer(function() {
+	this.vlc.play("http://archive.org/download/CrayonDragonAnAnimatedShortFilmByTonikoPantoja/Crayon%20Dragon%20-%20An%20animated%20short%20film%20by%20Toniko%20Pantoja.mp4");
+});
+</script>
+</body>
+</html>

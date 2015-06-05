@@ -1,0 +1,220 @@
+@font-face {
+  font-family: 'Glyphs';
+  src: url('../fonts/glyphicons.ttf');
+}
+@font-face {
+  font-family: 'OpenSans';
+  src: url('../fonts/opensans.ttf');
+}
+@font-face {
+  font-family: 'SourceSans';
+  src: url('../fonts/sourcesanspro.ttf');
+}
+
+.wcp-canvas { z-index: 1 }
+
+.wcp-center {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%,-50%);
+}
+
+.wcp-wrapper {
+	width: 100%;
+	height: 100%;
+	background-color: #000;
+	position: relative;
+	overflow: hidden;
+	-webkit-user-select: none;
+}
+
+.wcp-surface {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+	z-index: 3;
+}
+
+.wcp-toolbar {
+	width: 100%;
+	height: 38px;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+	z-index: 4;
+}
+
+.wcp-toolbar-background {
+	width: 100%;
+	height: 30px;
+	background: #000;
+	opacity: 0.9;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+	z-index: -1;
+}
+
+/* progress bar */
+.wcp-progress-bar {
+	width: 100%;
+	height: 8px;
+	background: #262626;
+    position: absolute;
+    top: 0;
+    left: 0;
+	overflow: hidden;
+	white-space: nowrap;
+	cursor: pointer;
+}
+
+.wcp-progress-seen {
+	background: #08758f;
+	height: 8px;
+	width: 0%;
+	display: inline-block
+}
+
+.wcp-progress-pointer {
+	background: #e5e5e5;
+	height: 8px;
+	width: 8px;
+	margin-left: -4px;
+	display: inline-block
+}
+
+.wcp-button {
+	font-family: 'Glyphs';
+	display: inline-block;
+	height: 30px;
+	width: 59px;
+	margin-top: 8px;
+	text-align: center;
+	line-height: 30px;
+	font-size: 18px;
+	color: #7b7b7b;
+}
+
+.wcp-button:hover {
+	color: #ffffff;
+	cursor: pointer
+}
+
+.wcp-left {
+	border-right: 1px solid #262626;
+}
+
+.wcp-right {
+	border-left: 1px solid #262626;
+	float: right;
+}
+
+.wcp-vol-button {
+	width: 42px;
+	font-size: 21px;
+	border-right: none
+}
+
+.wcp-vol-control {
+	width: 0px;
+	border-right: 1px solid #262626;
+	height: 30px;
+	display: inline-block;
+	position: relative;
+	top: 8px;
+	overflow: hidden
+}
+
+.wcp-vol-bar {
+	display: inline-block;
+	height: 8px;
+	width: 120px;
+	overflow: visible;
+	margin: 0 10px;
+	margin-left: 2px;
+	background: #696969;
+	position: relative;
+	top: 11px;
+	cursor: pointer;
+}
+
+.wcp-vol-bar-full {
+	background: #e77607;
+	height: 100%;
+	width: 58px;
+	float: left;
+}
+
+.wcp-vol-bar-pointer {
+	width: 4px;
+	height: 14px;
+	background: #fff;
+	margin-top: -3px;
+	float: left;
+}
+
+.wcp-time {
+	font-family: 'SourceSans';
+	color: #828282;
+	display: inline-block;
+	height: 30px;
+	margin-top: 8px;
+	text-align: center;
+	line-height: 30px;
+	font-size: 14px;
+	margin-left: 10px;
+	position: relative;
+	top: -2px
+}
+
+/*  Playback Button Icons */
+.wcp-prev:before { content: "\E80A" }
+.wcp-play:before { content: "\E87F" }
+.wcp-pause:before { content: "\E880" }
+.wcp-replay:before { content: "\E8A7" }
+.wcp-next:before { content: "\E809" }
+
+/*  Audio Related Button Icons */
+.wcp-mute:before { content: "\E877" }
+.wcp-volume-low:before { content: "\E876" }
+.wcp-volume-medium:before { content: "\E875" }
+.wcp-volume-high:before { content: "\E878" }
+
+/* Fullscreen Button Icons */
+.wcp-minimize:before { content: "\E805"; font-size: 24px }
+.wcp-maximize:before { content: "\E804"; font-size: 24px }
+
+/* Toggle Pause Animation */
+.wcp-pause-anim {
+	font-family: 'Glyphs';
+	color: #fff;
+	opacity: 0.7;
+	z-index: 2;
+	display: none;
+}
+.wcp-anim-basic {
+	background-color: #1c1c1c;
+	font-style: normal;
+	padding: 5px 20px;
+	border-radius: 5px;
+	font-size: 50px;
+}
+.wcp-anim-icon-play:before { content: "\E82D" }
+.wcp-anim-icon-pause:before { content: "\E82E" }
+
+/* Status Message */
+.wcp-status {
+	font-family: "OpenSans";
+	position: absolute;
+	top: 10px;
+	left: 0;
+	width: 100%;
+	font-size: 20px;
+	z-index: 2;
+	color: #fff;
+	text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
+	text-align: center
+}
