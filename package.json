@@ -1,10 +1,12 @@
 {
-    "name": "WebChimera.js Player Demo",
+    "name": "wcjs-player",
+    "description": "WebChimera.js Player Demo",
     "version": "0.0.1",
     "private": true,
     "main": "app://host/index.html",
     "dependencies": {
-        "bindings": "~1.2.1"
+        "bindings": "~1.2.1",
+        "webchimera.js": "*"
     },
     "env": "development"
 }
