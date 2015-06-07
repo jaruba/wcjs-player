@@ -63,8 +63,8 @@ wjs.init = function(context) {
 
 wjs.init.prototype.addPlayer = function(wcpSettings,cb) {
 	
-	if (!$("link[href='/player/css/webchimera.css']").length)
-	$('<link href="/player/css/webchimera.css" rel="stylesheet">').appendTo("head");
+	if (!$("link[href='player/css/webchimera.css']").length)
+	$('<link href="player/css/webchimera.css" rel="stylesheet">').appendTo("head");
 	
 	if (typeof wcpSettings === 'function') {
 		cb = wcpSettings;
