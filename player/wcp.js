@@ -21,7 +21,8 @@
 var vlcs = {},
 	$ = require('jquery'),
 	seekDrag = false,
-	volDrag = false;
+	volDrag = false,
+	hideUI;
 
 var wjs = function(context) {
 	// Call the constructor
@@ -181,8 +182,18 @@ wjs.init.prototype.addPlayer = function(wcpSettings,cb) {
 		}
 	});
 	
+	$(".wcp-wrapper").parent().bind("mousemove",function(e) {
+		clearInterval(hideUI);
+		$(".wcp-wrapper").parent().css({cursor: 'default'})
+		$(".wcp-toolbar").fadeIn();
+		if (!volDrag && !seekDrag) hideUI = setTimeout(function() { $(".wcp-toolbar").fadeOut(); $(".wcp-wrapper").parent().css({cursor: 'none'}); },3000);
+	});
+	
     /* Progress and Volume Bars */
 	$(window).bind("mouseup",function(e) {
+		clearInterval(hideUI);
+		$(".wcp-wrapper").parent().css({cursor: 'default'})
+		hideUI = setTimeout(function() { $(".wcp-toolbar").fadeOut(); $(".wcp-wrapper").parent().css({cursor: 'none'}); },3000);
 		if (seekDrag) {
 			seekDrag = false;
 			var rect = $(".wcp-wrapper")[0].getBoundingClientRect();
