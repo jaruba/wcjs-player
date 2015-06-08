@@ -120,11 +120,8 @@ wjs.init.prototype.addPlayer = function(wcpSettings,cb) {
 				vlc.stop();
 				vlc.play();
 				switchClass(this,"wcp-replay","wcp-pause");
-			} else if (buttonClass == "wcp-replay") {
-				switchClass($(".wcp-anim-basic")[0],"wcp-anim-icon-pause","wcp-anim-icon-play");
-				animatePause();
-				vlc.play();
-				switchClass(this,"wcp-replay","wcp-pause");
+				$(".wcp-progress-seen").css("width","0%");
+				$(".wcp-time-current").text("00:00");
 			} else if (["wcp-volume-low","wcp-volume-medium","wcp-volume-high"].indexOf(buttonClass) > -1) {
 				switchClass(this,buttonClass,"wcp-mute");
 				vlc.toggleMute();
@@ -148,11 +145,15 @@ wjs.init.prototype.addPlayer = function(wcpSettings,cb) {
 	// surface click actions
 	$(".wcp-surface").click(function() {
 		vlc = wjs("#"+$(this).parents(".wcp-wrapper")[0].id).vlc;
-		if ([3,4,6].indexOf(vlc.state) > -1) {
-			if ([4,6].indexOf(vlc.state) > -1) {
+		if (vlc.state == 6) {
+			$(".wcp-replay").trigger("click");
+			return;
+		}
+		if ([3,4].indexOf(vlc.state) > -1) {
+			if (vlc.state == 4) {
 				switchClass($(".wcp-anim-basic")[0],"wcp-anim-icon-pause","wcp-anim-icon-play");
 				switchClass($(".wcp-play")[0],"wcp-play","wcp-pause");
-			} else if ([3].indexOf(vlc.state) > -1) {
+			} else if (vlc.state == 3) {
 				switchClass($(".wcp-anim-basic")[0],"wcp-anim-icon-play","wcp-anim-icon-pause");
 				switchClass($(".wcp-pause")[0],"wcp-pause","wcp-play");
 			}
