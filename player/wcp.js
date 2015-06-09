@@ -337,7 +337,7 @@ wjs.init.prototype.addPlayer = function(wcpSettings,cb) {
 	// set initial status message font size
 	var fontSize = (parseInt($(this.allElements[0]).height())/15);
 	if (fontSize < 20) fontSize = 20;
-	$(wjs(newid).allElements[0].childNodes[4]).css('fontSize', fontSize);
+	$(this.allElements[0]).find(".wcp-status").css('fontSize', fontSize);
 
 	// create player and attach event handlers
 	var wcAddon = require("webchimera.js");
@@ -394,29 +394,26 @@ wjs.init.prototype.timePassed = function(t) {
 };
 
 wjs.init.prototype.positionChanged = function(position) {
-	if (!seekDrag) this.allElements[0].childNodes[3].childNodes[1].childNodes[0].style.width = (position*100)+"%";
+	if (!seekDrag) $(this.allElements[0]).find(".wcp-progress-seen")[0].style.width = (position*100)+"%";
 };
 
 wjs.init.prototype.isOpening = function(position) {
-	var style = window.getComputedStyle(this.allElements[0].childNodes[4]);
-	if (style.display === 'none') $(this.allElements[0].childNodes[4]).show();
-	$(this.allElements[0].childNodes[4]).text("Opening");
+	var style = window.getComputedStyle($(this.allElements[0]).find(".wcp-status")[0]);
+	if (style.display === 'none') $(this.allElements[0]).find(".wcp-status").show();
+	$(this.allElements[0]).find(".wcp-status").text("Opening");
 };
 
 wjs.init.prototype.isBuffering = function(percent) {
-	var style = window.getComputedStyle(this.allElements[0].childNodes[4]);
-	if (style.display === 'none') $(this.allElements[0].childNodes[4]).show();
-	$(this.allElements[0].childNodes[4]).text("Buffering "+percent+"%");
-	if (percent == 100) $(this.allElements[0].childNodes[4]).fadeOut(1200);
+	var style = window.getComputedStyle($(this.allElements[0]).find(".wcp-status")[0]);
+	if (style.display === 'none') $(this.allElements[0]).find(".wcp-status").show(0);
+	$(this.allElements[0]).find(".wcp-status").text("Buffering "+percent+"%");
+	if (percent == 100) $(this.allElements[0]).find(".wcp-status").fadeOut(1200);
 };
 
 wjs.init.prototype.isPlaying = function() {
-	var style = window.getComputedStyle(this.allElements[0].childNodes[4]);
-	if (style.display !== 'none') $(this.allElements[0].childNodes[4]).fadeOut(1200);
+	var style = window.getComputedStyle($(this.allElements[0]).find(".wcp-status")[0]);
+	if (style.display !== 'none') $(this.allElements[0]).find(".wcp-status").fadeOut(1200);
 	$(this.allElements[0]).find(".wcp-time-total").text(parseTime(this.vlc.length));
-//	$(this.allElements[0]).find(".wcp-time").show();
-//	var style = window.getComputedStyle($(this.allElements[0]).find(".wcp-time")[0]);
-//	if (style.display === 'none') $(this.allElements[0]).find(".wcp-time").fadeIn();
 };
 
 wjs.init.prototype.hasEnded = function() {
@@ -428,7 +425,7 @@ wjs.init.prototype.autoResize = function() {
 	// resize status font size
 	var fontSize = (parseInt($(this.allElements[0]).height())/15);
 	if (fontSize < 20) fontSize = 20;
-	$(this.allElements[0].childNodes[4]).css('fontSize', fontSize);
+	$(this.allElements[0]).find(".wcp-status").css('fontSize', fontSize);
 	
 	// resize video layer
 	var container = $(this.context);
