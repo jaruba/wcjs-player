@@ -83,7 +83,7 @@ wjs.init.prototype.addPlayer = function(wcpSettings,cb) {
 		else { var targetid = ' id="'+newid+'" class="wcp-wrapper"'; newid = "#"+newid; }
 	} else { var targetid = ' id="webchimera" class="wcp-wrapper"'; newid = "#webchimera"; }
 	
-	playerbody = '<div' + targetid + ' style="height: 100%"><canvas class="wcp-canvas wcp-center"></canvas><div class="wcp-surface"></div><div class="wcp-pause-anim wcp-center"><i class="wcp-anim-basic wcp-anim-icon-play"></i></div><div class="wcp-toolbar"><div class="wcp-toolbar-background"></div><div class="wcp-progress-bar"><div class="wcp-progress-seen"></div><div class="wcp-progress-pointer"></div></div><div class="wcp-button wcp-left wcp-pause"></div><div class="wcp-button wcp-left wcp-vol-button wcp-volume-medium"></div><div class="wcp-vol-control"><div class="wcp-vol-bar"><div class="wcp-vol-bar-full"></div><div class="wcp-vol-bar-pointer"></div></div></div><div class="wcp-time"><span class="wcp-time-current">00:00</span> / <span class="wcp-time-total">00:00</span></div><div class="wcp-button wcp-right wcp-maximize"></div></div><div class="wcp-status"></div></div>';
+	playerbody = '<div' + targetid + ' style="height: 100%"><canvas class="wcp-canvas wcp-center"></canvas><div class="wcp-surface"></div><div class="wcp-pause-anim wcp-center"><i class="wcp-anim-basic wcp-anim-icon-play"></i></div><div class="wcp-toolbar"><div class="wcp-toolbar-background"></div><div class="wcp-progress-bar"><div class="wcp-progress-seen"></div><div class="wcp-progress-pointer"></div></div><div class="wcp-button wcp-left wcp-pause"></div><div class="wcp-button wcp-left wcp-vol-button wcp-volume-medium"></div><div class="wcp-vol-control"><div class="wcp-vol-bar"><div class="wcp-vol-bar-full"></div><div class="wcp-vol-bar-pointer"></div></div></div><div class="wcp-time"><span class="wcp-time-current">00:00</span> / <span class="wcp-time-total">00:00</span></div><div class="wcp-button wcp-right wcp-maximize"></div></div><div class="wcp-status"></div><div class="wcp-tooltip"><div class="wcp-tooltip-arrow"></div><div class="wcp-tooltip-inner">00:00</div></div></div>';
 
 	$(this.context).each(function(ij,el) { el.innerHTML = playerbody; });
 	
@@ -191,6 +191,44 @@ wjs.init.prototype.addPlayer = function(wcpSettings,cb) {
 	});
 	
     /* Progress and Volume Bars */
+	$(".wcp-progress-bar").hover(function(e) {
+		vlc = wjs("#"+$(".wcp-wrapper")[0].id).vlc;
+		if (vlc.length) {
+			var rect = $(".wcp-wrapper")[0].getBoundingClientRect();
+			if (e.pageX >= rect.left && e.pageX <= rect.right) {
+				var newtime = Math.floor(vlc.length * ((e.pageX - rect.left) / $(this).width()));
+				if (newtime > 0) {
+					$(".wcp-tooltip-inner").text(parseTime(newtime));
+					var offset = Math.floor($(".wcp-tooltip").width() / 2);
+					if (e.pageX >= (offset + rect.left) && e.pageX <= (rect.right - offset)) {
+						$(".wcp-tooltip").css("left",((e.pageX - rect.left) - offset)+"px");
+					} else if (e.pageX < (rect.left + offset)) $(".wcp-tooltip").css("left",rect.left+"px");
+					else if (e.pageX > (rect.right - offset)) $(".wcp-tooltip").css("left",(rect.right - $(".wcp-tooltip").width())+"px");
+					$(".wcp-tooltip").show(0);
+				}
+			} else $(".wcp-tooltip").hide(0);
+		}
+	}, function(e) {
+		if (!seekDrag) $(".wcp-tooltip").hide(0);
+	});
+	$(".wcp-progress-bar").bind("mousemove",function(e) {
+		vlc = wjs("#"+$(".wcp-wrapper")[0].id).vlc;
+		if (vlc.length) {
+			var rect = $(".wcp-wrapper")[0].getBoundingClientRect();
+			if (e.pageX >= rect.left && e.pageX <= rect.right) {
+				var newtime = Math.floor(vlc.length * ((e.pageX - rect.left) / $(this).width()));
+				if (newtime > 0) {
+					$(".wcp-tooltip-inner").text(parseTime(newtime));
+					var offset = Math.floor($(".wcp-tooltip").width() / 2);
+					if (e.pageX >= (offset + rect.left) && e.pageX <= (rect.right - offset)) {
+						$(".wcp-tooltip").css("left",((e.pageX - rect.left) - offset)+"px");
+					} else if (e.pageX < (rect.left + offset)) $(".wcp-tooltip").css("left",rect.left+"px");
+					else if (e.pageX > (rect.right - offset)) $(".wcp-tooltip").css("left",(rect.right - $(".wcp-tooltip").width())+"px");
+					$(".wcp-tooltip").show(0);
+				}
+			} else $(".wcp-tooltip").hide(0);
+		}
+	});
 	$(window).bind("mouseup",function(e) {
 		clearInterval(hideUI);
 		$(".wcp-wrapper").parent().css({cursor: 'default'})
@@ -204,6 +242,8 @@ wjs.init.prototype.addPlayer = function(wcpSettings,cb) {
 				$(".wcp-progress-seen").css("width", (p*100)+"%");
 				vlc.position = p;
 			}
+			$(".wcp-tooltip").hide(0);
+			$(".wcp-time-current").text($(".wcp-tooltip-inner").text());
 		}
 		if (volDrag) {
 			volDrag = false;
@@ -237,6 +277,17 @@ wjs.init.prototype.addPlayer = function(wcpSettings,cb) {
 			if (e.pageX >= rect.left && e.pageX <= rect.right) {
 				p = (e.pageX - rect.left) / (rect.right - rect.left);
 				$(".wcp-progress-seen").css("width", (p*100)+"%");
+
+				var newtime = Math.floor(vlc.length * ((e.pageX - rect.left) / $(this).width()));
+				if (newtime > 0) {
+					$(".wcp-tooltip-inner").text(parseTime(newtime));
+					var offset = Math.floor($(".wcp-tooltip").width() / 2);
+					if (e.pageX >= (offset + rect.left) && e.pageX <= (rect.right - offset)) {
+						$(".wcp-tooltip").css("left",((e.pageX - rect.left) - offset)+"px");
+					} else if (e.pageX < (rect.left + offset)) $(".wcp-tooltip").css("left",rect.left+"px");
+					else if (e.pageX > (rect.right - offset)) $(".wcp-tooltip").css("left",(rect.right - $(".wcp-tooltip").width())+"px");
+					$(".wcp-tooltip").show(0);
+				}
 			}
 		}
 		if (volDrag) {
