@@ -22,7 +22,8 @@ var vlcs = {},
 	$ = require('jquery'),
 	seekDrag = false,
 	volDrag = false,
-	hideUI;
+	hideUI,
+	timestampUI;
 
 var wjs = function(context) {
 	// Call the constructor
@@ -187,7 +188,12 @@ wjs.init.prototype.addPlayer = function(wcpSettings,cb) {
 		clearInterval(hideUI);
 		$(".wcp-wrapper").parent().css({cursor: 'default'})
 		$(".wcp-toolbar").fadeIn();
-		if (!volDrag && !seekDrag) hideUI = setTimeout(function() { $(".wcp-toolbar").fadeOut(); $(".wcp-wrapper").parent().css({cursor: 'none'}); },3000);
+		if (!volDrag && !seekDrag) {
+			if ($($(".wcp-toolbar").selector + ":hover").length > 0) {
+				hideUI = setTimeout(function() { wcp_hideUI(); },6000);
+				timestampUI = Math.floor(Date.now() / 1000);
+			} else hideUI = setTimeout(function() { wcp_hideUI(); },3000);
+		}
 	});
 	
     /* Progress and Volume Bars */
@@ -232,7 +238,7 @@ wjs.init.prototype.addPlayer = function(wcpSettings,cb) {
 	$(window).bind("mouseup",function(e) {
 		clearInterval(hideUI);
 		$(".wcp-wrapper").parent().css({cursor: 'default'})
-		hideUI = setTimeout(function() { $(".wcp-toolbar").fadeOut(); $(".wcp-wrapper").parent().css({cursor: 'none'}); },3000);
+		hideUI = setTimeout(function() { wcp_hideUI(); },3000);
 		if (seekDrag) {
 			seekDrag = false;
 			var rect = $(".wcp-wrapper")[0].getBoundingClientRect();
@@ -646,4 +652,14 @@ function parseTime(t,total) {
 	} else {
 		return tempMinute + ":" + tempSecond;
 	}
+}
+
+function wcp_hideUI() {
+	if ($($(".wcp-toolbar").selector + ":hover").length > 0 && timestampUI + 20 > Math.floor(Date.now() / 1000))  {
+		hideUI = setTimeout(function() { wcp_hideUI(); },6000);
+		return;
+	}
+	$(".wcp-toolbar").fadeOut();
+	$(".wcp-tooltip").fadeOut();
+	$(".wcp-wrapper").parent().css({cursor: 'none'});
 }
