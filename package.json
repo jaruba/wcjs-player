@@ -18,6 +18,7 @@
         "url" : "https://github.com/jaruba/wcjs-player"
     },
     "dependencies": {
-        "wcjs-renderer": "*"
+        "wcjs-renderer": "*",
+        "jquery": "*"
     }
 }
