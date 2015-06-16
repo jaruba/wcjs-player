@@ -16,7 +16,7 @@
 * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
 *****************************************************************************/
 
-// WebChimera.js Player v0.2.0
+// WebChimera.js Player v0.2.1
 
 var vlcs = {},
 	$ = require('jquery'),
@@ -30,7 +30,7 @@ $('<link href="'+__dirname.replace("\\","/")+'/public/general.css" rel="styleshe
 
 function wjs(context) {
 	
-	this.version = "v0.2.0";
+	this.version = "v0.2.1";
 
 	// Save the context
 	this.context = (typeof context === "undefined") ? "#webchimera" : context;  // if no playerid set, default to "webchimera"
