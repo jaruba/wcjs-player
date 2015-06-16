@@ -1,13 +1,23 @@
+
 {
     "name": "wcjs-player",
-    "description": "WebChimera.js Player Demo",
-    "version": "0.0.1",
-    "private": true,
-    "main": "app://host/index.html",
-    "dependencies": {
-        "bindings": "~1.2.1",
-        "jquery": "*",
-        "webchimera.js": "*"
+    "description": "Player for WebChimera.js (libvlc wrapper)",
+    "version": "0.1.2",
+    "license" : "GPLv2",
+    "author": "Branza Victor-Alexandru <branza.alex@gmail.com>",
+    "keywords": [
+        "video",
+        "player",
+        "webchimera",
+        "webchimera.js",
+        "vlc",
+        "libvlc"
+    ],
+    "repository": {
+        "type" : "git",
+        "url" : "https://github.com/jaruba/wcjs-player"
     },
-    "env": "development"
+    "dependencies": {
+        "wcjs-renderer": "*"
+    }
 }

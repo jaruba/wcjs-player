@@ -3,32 +3,62 @@
 
 An Open Source Player for WebChimera.js (libvlc binding for node.js/io.js/NW.js/Electron)
 
-**Dependencies:**
-- [WebChimera.js](https://github.com/RSATom/WebChimera.js)
-- [jQuery](https://www.npmjs.com/package/jquery)
+**Prerequisites:**
+- [WebChimera.js prerequisites](https://github.com/RSATom/WebChimera.js#build-prerequisites)
 
-**Install the Demo:**
-- ``git clone https://github.com/RSATom/wcjs-player.git``
-- ``cd wcjs-player``
-- ``npm install``
-- add contents of the vlc version package you want to use to your app's root folder (for Win: [latest vlc release](http://www.videolan.org/vlc/download-windows.html))
-- add [NW.js](http://nwjs.io/) or [Electron](http://electron.atom.io/) to the folder
-
-**Adding the Player to Your App:**
-- [download the latest WebChimera.js Player](https://github.com/jaruba/wcjs-player/archive/master.zip)
-- copy the ``/player`` folder from the archive to your app's root folder
-- ``npm install jquery``
-- ``npm install webchimera.js``
-- add contents of the vlc version package you want to use to your app's root folder (for Win: [latest vlc release](http://www.videolan.org/vlc/download-windows.html))
-- add ``<script src="player/wcp.js"></script>`` to your HTML file
+**Install:**
+- ``npm install wcjs-player``
 
 **API:**
 - ``wjs(element).addPlayer(cb)`` - adds the player to any element of the page
 - ``wjs(element).vlc`` - holds the [WebChimera.js API](https://github.com/RSATom/WebChimera.js/wiki/JS-API)
 
-**Notes:**
+**Usage Example 1:**
 
-Usage example can be seen in ``index.html``, for the current experimental version the ``/player`` folder needs to be in the root path of your app.
+*HTML*
+
+	<div id="player_wrapper"></div>
+
+*JS*
+
+	var wcp = require("wcjs-player");
+	var player = new wcp("#player_wrapper");
+
+	player.addPlayer(function(){
+		this.vlc.play("http://archive.org/download/CartoonClassics/Krazy_Kat_-_Keeping_Up_With_Krazy.mp4");
+	});
+
+
+**Usage Example 2 (two players):**
+
+*CSS* (all player wrappers are natively assigned the ``webchimeras`` class)
+
+	.webchimeras {
+		float: left;
+		width: 50%;
+		height: 100%
+	}
+
+*HTML*
+
+	<div id="player_wrapper1"></div>
+	<div id="player_wrapper2"></div>
+
+*JS*
+
+	var wcp = require("wcjs-player");
+	var player = new wcp("#player_wrapper1");
+	
+	player.addPlayer(function(){
+		this.vlc.play("http://archive.org/download/CrayonDragonAnAnimatedShortFilmByTonikoPantoja/Crayon%20Dragon%20-%20An%20animated%20short%20film%20by%20Toniko%20Pantoja.mp4");
+	});
+	
+	var player2 = new wcp("#player_wrapper2");
+	
+	player2.addPlayer(function(){
+		this.vlc.play("http://archive.org/download/CartoonClassics/Krazy_Kat_-_Keeping_Up_With_Krazy.mp4");
+	});
+
 
 **Screenshots:**
 
