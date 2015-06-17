@@ -35,6 +35,8 @@ function wjs(context) {
 	// Save the context
 	this.context = (typeof context === "undefined") ? "#webchimera" : context;  // if no playerid set, default to "webchimera"
 	
+	if (hasClass($(this.context)[0],"webchimeras")) this.context = "#"+$(this.context).find(".wcp-wrapper")[0].id;
+	
 	this.video = { }; // Video Object (holds width, height, pixelFormat)
 
 	if (this.context.substring(0,1) == "#") {
@@ -60,12 +62,7 @@ function wjs(context) {
 	return this;
 };
 
-wjs.prototype.addPlayer = function(wcpSettings,cb) {
-	
-	if (typeof wcpSettings === 'function') {
-		cb = wcpSettings;
-		wcpSettings = null;
-	}
+wjs.prototype.addPlayer = function(wcpSettings) {
 	
 	if (wcpSettings) newid = (typeof wcpSettings["id"] === "undefined") ? "webchimera" : wcpSettings["id"]; // if no id set, default to "webchimera"
 	else newid = "webchimera";
@@ -332,9 +329,7 @@ wjs.prototype.addPlayer = function(wcpSettings,cb) {
 		}
 	}(newid);
 
-	cb.call(wjs(newid));
-
-	return wjs(newid);
+	return new wjs(newid);
 };
 
 function progressHoverIn(e) {
