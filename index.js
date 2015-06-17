@@ -81,10 +81,24 @@ wjs.prototype.addPlayer = function(wcpSettings,cb) {
 		else { var targetid = ' id="'+newid+'" class="wcp-wrapper"'; newid = "#"+newid; }
 	} else { var targetid = ' id="webchimera" class="wcp-wrapper"'; newid = "#webchimera"; }
 	
-	playerbody = '<div' + targetid + ' style="height: 100%"><canvas class="wcp-canvas wcp-center"></canvas><div class="wcp-surface"></div><div class="wcp-pause-anim wcp-center"><i class="wcp-anim-basic wcp-anim-icon-play"></i></div><div class="wcp-toolbar"><div class="wcp-toolbar-background"></div><div class="wcp-progress-bar"><div class="wcp-progress-seen"></div><div class="wcp-progress-pointer"></div></div><div class="wcp-button wcp-left wcp-pause"></div><div class="wcp-button wcp-left wcp-vol-button wcp-volume-medium"></div><div class="wcp-vol-control"><div class="wcp-vol-bar"><div class="wcp-vol-bar-full"></div><div class="wcp-vol-bar-pointer"></div></div></div><div class="wcp-time"><span class="wcp-time-current">00:00</span> / <span class="wcp-time-total">00:00</span></div><div class="wcp-button wcp-right wcp-maximize"></div></div><div class="wcp-status"></div><div class="wcp-tooltip"><div class="wcp-tooltip-arrow"></div><div class="wcp-tooltip-inner">00:00</div></div></div>';
+	vlcs[newid] = {};
+	if (wcpSettings) {
+		vlcs[newid].multiscreen = (typeof wcpSettings["multiscreen"] === "undefined") ? false : wcpSettings["multiscreen"];
+	} else {
+		vlcs[newid].multiscreen = false;
+	}
 
+	playerbody = '<div' + targetid + ' style="height: 100%"><canvas class="wcp-canvas wcp-center"></canvas><div class="wcp-surface"></div><div class="wcp-pause-anim wcp-center"><i class="wcp-anim-basic wcp-anim-icon-play"></i></div><div class="wcp-toolbar"><div class="wcp-toolbar-background"></div><div class="wcp-progress-bar"><div class="wcp-progress-seen"></div><div class="wcp-progress-pointer"></div></div><div class="wcp-button wcp-left wcp-pause"></div><div class="wcp-button wcp-left wcp-vol-button wcp-volume-medium"></div><div class="wcp-vol-control"><div class="wcp-vol-bar"><div class="wcp-vol-bar-full"></div><div class="wcp-vol-bar-pointer"></div></div></div><div class="wcp-time"><span class="wcp-time-current">00:00</span> / <span class="wcp-time-total">00:00</span></div><div class="wcp-button wcp-right wcp-maximize"></div></div><div class="wcp-status"></div><div class="wcp-tooltip"><div class="wcp-tooltip-arrow"></div><div class="wcp-tooltip-inner">00:00</div></div></div>';
+	
 	$(this.context).each(function(ij,el) { if (!hasClass(el,"webchimeras")) $(el).addClass("webchimeras"); el.innerHTML = playerbody; });
 	
+	if (vlcs[newid].multiscreen) {
+		vlcs[newid].multiscreen = (typeof wcpSettings["multiscreen"] === "undefined") ? false : wcpSettings["multiscreen"];
+		$(newid).find(".wcp-toolbar").hide(0);
+		$(newid).find(".wcp-tooltip").hide(0);
+		$(newid).css({cursor: 'pointer'});
+	}
+
 	wjs(newid).canvas = $(".wcp-wrapper")[0].firstChild;
 
 	// resize video when window is resized
@@ -129,6 +143,14 @@ wjs.prototype.addPlayer = function(wcpSettings,cb) {
 			if (window.document.webkitCancelFullScreen) window.document.webkitCancelFullScreen();
 			else if (window.document.cancelFullScreen) window.document.cancelFullScreen();
 			switchClass(this,"wcp-minimize","wcp-maximize");
+			if (vlcs["#"+$(this).parents(".wcp-wrapper")[0].id].multiscreen) {
+				$(this).parents(".wcp-wrapper").find(".wcp-toolbar").hide(0);
+				$(this).parents(".wcp-wrapper").find(".wcp-tooltip").hide(0);
+				$(this).parents(".wcp-wrapper").css({cursor: 'pointer'});
+				if (!wjs("#"+$(this).parents(".wcp-wrapper")[0].id).vlc.mute) {
+					wjs("#"+$(this).parents(".wcp-wrapper")[0].id).vlc.mute = true;
+				}
+			}
 		} else if (buttonClass == "wcp-maximize") {
 			wcpWrapper = $(this).parents(".wcp-wrapper")[0];
 			if (wcpWrapper.webkitRequestFullscreen) wcpWrapper.webkitRequestFullscreen();
@@ -146,15 +168,26 @@ wjs.prototype.addPlayer = function(wcpSettings,cb) {
 			return;
 		}
 		if ([3,4].indexOf(vlc.state) > -1) {
-			if (vlc.state == 4) {
-				switchClass($(this).parent().find(".wcp-anim-basic")[0],"wcp-anim-icon-pause","wcp-anim-icon-play");
-				switchClass($(this).parent().find(".wcp-play")[0],"wcp-play","wcp-pause");
-			} else if (vlc.state == 3) {
-				switchClass($(this).parent().find(".wcp-anim-basic")[0],"wcp-anim-icon-play","wcp-anim-icon-pause");
-				switchClass($(this).parent().find(".wcp-pause")[0],"wcp-pause","wcp-play");
+			if (vlcs["#"+$(this).parents(".wcp-wrapper")[0].id].multiscreen && window.document.webkitFullscreenElement == null) {
+				wcpWrapper = $(this).parents(".wcp-wrapper")[0];
+				if (wcpWrapper.webkitRequestFullscreen) wcpWrapper.webkitRequestFullscreen();
+				else if (wcpWrapper.requestFullscreen) wcpWrapper.requestFullscreen();
+				$(wcpWrapper).css({cursor: 'default'});
+				if (wjs("#"+$(this).parents(".wcp-wrapper")[0].id).vlc.mute) {
+					wjs("#"+$(this).parents(".wcp-wrapper")[0].id).vlc.mute = false;
+				}
+				switchClass($(this).parent().find(".wcp-maximize")[0],"wcp-maximize","wcp-minimize");
+			} else {
+				if (vlc.state == 4) {
+					switchClass($(this).parent().find(".wcp-anim-basic")[0],"wcp-anim-icon-pause","wcp-anim-icon-play");
+					switchClass($(this).parent().find(".wcp-play")[0],"wcp-play","wcp-pause");
+				} else if (vlc.state == 3) {
+					switchClass($(this).parent().find(".wcp-anim-basic")[0],"wcp-anim-icon-play","wcp-anim-icon-pause");
+					switchClass($(this).parent().find(".wcp-pause")[0],"wcp-pause","wcp-play");
+				}
+				animatePause($(this).parent()[0].id);
+				vlc.togglePause();
 			}
-			animatePause($(this).parent()[0].id);
-			vlc.togglePause();
 		}
 	});
 	
@@ -176,18 +209,31 @@ wjs.prototype.addPlayer = function(wcpSettings,cb) {
 			if ($(this).parents(".wcp-wrapper").find(".wcp-maximize") > 0) {
 				switchClass($(this).parents(".wcp-wrapper").find(".wcp-minimize"),"wcp-minimize","wcp-maximize");
 			}
+			if (vlcs["#"+$(this).parents(".wcp-wrapper")[0].id].multiscreen) {
+				$(this).parents(".wcp-wrapper").find(".wcp-toolbar").hide(0);
+				$(this).parents(".wcp-wrapper").find(".wcp-tooltip").hide(0);
+				$(this).parents(".wcp-wrapper").css({cursor: 'pointer'});
+				if (!wjs("#"+$(this).parents(".wcp-wrapper")[0].id).vlc.mute) {
+					wjs("#"+$(this).parents(".wcp-wrapper")[0].id).vlc.mute = true;
+				}
+			}
 		}
 	});
 	
 	$(wjs(newid).canvas).parent().parent().bind("mousemove",function(e) {
-		clearTimeout(vlcs["#"+$(this).find(".wcp-wrapper")[0].id].hideUI);
-		$(this).css({cursor: 'default'});
-		$(this).find(".wcp-toolbar").stop().show(0);
-		if (!volDrag && !seekDrag) {
-			if ($($(this).find(".wcp-toolbar").selector + ":hover").length > 0) {
-				vlcs["#"+$(this).find(".wcp-wrapper")[0].id].hideUI = setTimeout(function(i) { return function() { wcp_hideUI($(i).parent()); } }($(this)),3000);
-				vlcs["#"+$(this).find(".wcp-wrapper")[0].id].timestampUI = Math.floor(Date.now() / 1000);
-			} else vlcs["#"+$(this).find(".wcp-wrapper")[0].id].hideUI = setTimeout(function(i) { return function() { wcp_hideUI(i); } }($(this)),3000);
+		if (vlcs["#"+$(this).find(".wcp-wrapper")[0].id].multiscreen && window.document.webkitFullscreenElement == null) {
+			$(this).css({cursor: 'default'});
+		} else {
+			clearTimeout(vlcs["#"+$(this).find(".wcp-wrapper")[0].id].hideUI);
+			$(this).css({cursor: 'default'});
+			
+			$(this).find(".wcp-toolbar").stop().show(0);
+			if (!volDrag && !seekDrag) {
+				if ($($(this).find(".wcp-toolbar").selector + ":hover").length > 0) {
+					vlcs["#"+$(this).find(".wcp-wrapper")[0].id].hideUI = setTimeout(function(i) { return function() { wcp_hideUI($(i).parent()); } }($(this)),3000);
+					vlcs["#"+$(this).find(".wcp-wrapper")[0].id].timestampUI = Math.floor(Date.now() / 1000);
+				} else vlcs["#"+$(this).find(".wcp-wrapper")[0].id].hideUI = setTimeout(function(i) { return function() { wcp_hideUI(i); } }($(this)),3000);
+			}
 		}
 	});
 	
@@ -245,7 +291,6 @@ wjs.prototype.addPlayer = function(wcpSettings,cb) {
 
 	// create player and attach event handlers
 	wjsPlayer = wjs(newid);
-	vlcs[newid] = {};
 	vlcs[newid].hideUI = setTimeout(function(i) { return function() { wcp_hideUI($(i).parent()); } }(newid),6000);
 	vlcs[newid].timestampUI = 0;
 	vlcs[newid].firstPlay = true;
@@ -291,27 +336,6 @@ wjs.prototype.addPlayer = function(wcpSettings,cb) {
 
 	return wjs(newid);
 };
-
-function surfaceClicked() {
-	wjsPlayer = wjs("#"+$(this).parent()[0].id);
-	vlc = wjsPlayer.vlc;
-	if (vlc.state == 6) {
-		$(this).parent().find(".wcp-replay").trigger("click");
-		return;
-	}
-	if ([3,4].indexOf(vlc.state) > -1) {
-		if (vlc.state == 4) {
-			switchClass($(this).parent().find(".wcp-anim-basic")[0],"wcp-anim-icon-pause","wcp-anim-icon-play");
-			switchClass($(this).parent().find(".wcp-play")[0],"wcp-play","wcp-pause");
-		} else if (vlc.state == 3) {
-			switchClass($(this).parent().find(".wcp-anim-basic")[0],"wcp-anim-icon-play","wcp-anim-icon-pause");
-			switchClass($(this).parent().find(".wcp-pause")[0],"wcp-pause","wcp-play");
-		}
-		animatePause($(this).parent()[0].id);
-		vlc.togglePause();
-	}
-
-}
 
 function progressHoverIn(e) {
 	wjsPlayer = wjs("#"+$(this).parents(".wcp-wrapper")[0].id);
@@ -551,13 +575,16 @@ function parseTime(t,total) {
 }
 
 function wcp_hideUI(wjsWrapper) {
-	if ($(wjsWrapper.find(".wcp-toolbar").selector + ":hover").length > 0 && vlcs["#"+wjsWrapper.find(".wcp-wrapper")[0].id].timestampUI + 20 > Math.floor(Date.now() / 1000))  {
-		vlcs["#"+wjsWrapper.find(".wcp-wrapper")[0].id].hideUI = setTimeout(function(i) { return function() { wcp_hideUI(i); } }(wjsWrapper),3000);
-		return;
+	if (vlcs["#"+wjsWrapper.find(".wcp-wrapper")[0].id].multiscreen && window.document.webkitFullscreenElement == null) {
+	} else {
+		if ($(wjsWrapper.find(".wcp-toolbar").selector + ":hover").length > 0 && vlcs["#"+wjsWrapper.find(".wcp-wrapper")[0].id].timestampUI + 20 > Math.floor(Date.now() / 1000))  {
+			vlcs["#"+wjsWrapper.find(".wcp-wrapper")[0].id].hideUI = setTimeout(function(i) { return function() { wcp_hideUI(i); } }(wjsWrapper),3000);
+			return;
+		}
+		wjsWrapper.find(".wcp-toolbar").stop().fadeOut();
+		wjsWrapper.find(".wcp-tooltip").stop().fadeOut();
+		wjsWrapper.css({cursor: 'none'});
 	}
-	wjsWrapper.find(".wcp-toolbar").stop().fadeOut();
-	wjsWrapper.find(".wcp-tooltip").stop().fadeOut();
-	wjsWrapper.css({cursor: 'none'});
 }
 
 module.exports = wjs;
