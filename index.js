@@ -105,6 +105,15 @@ wjs.prototype.addPlayer = function(wcpSettings,cb) {
 	if (firstTime) {
 		firstTime = false;
 		window.onresize = function() { autoResize(); };
+		$(window).bind("mouseup",function(i) {
+			return function(event) {
+				mouseClickEnd(wjs(i),event);
+			}
+		}(newid)).bind("mousemove",function(i) {
+			return function(event) {
+				mouseMoved(wjs(i),event);
+			}
+		}(newid));
 	}
 
 	// toolbar button actions
@@ -247,19 +256,10 @@ wjs.prototype.addPlayer = function(wcpSettings,cb) {
 		return progressMouseMoved.call(this,arg1);
 	});
 
-	$(window).bind("mouseup",function(i) {
-		return function(event) {
-			mouseClickEnd(wjs(i),event);
-		}
-	}(newid)).bind("mousemove",function(i) {
-		return function(event) {
-			mouseMoved(wjs(i),event);
-		}
-	}(newid));
-
     $(wjs(newid).canvas).parent().find(".wcp-progress-bar").bind("mousedown", function(e) {
 		seekDrag = true;
-		p = e.pageX / $(this).width();
+		var rect = $(this).parents(".wcp-wrapper")[0].getBoundingClientRect();
+		p = (e.pageX - rect.left) / $(this).width();
 		sel.call(this,".wcp-progress-seen").css("width", (p*100)+"%");
 	});
 
@@ -383,76 +383,148 @@ function mouseClickEnd(wjsPlayer,e) {
 	vlcs["#"+$(wjsPlayer.canvas).parent()[0].id].hideUI = setTimeout(function(i) { return function() { wcp_hideUI($(i).parent()); } }(wjsPlayer.context),3000);
 	if (seekDrag) {
 		seekDrag = false;
-		$('.webchimeras').each(function(i, obj) {
-			var rect = obj.getBoundingClientRect();
-			if (e.pageX >= rect.left && e.pageX <= rect.right) {
-				vlc = wjs("#"+$(obj).find(".wcp-wrapper")[0].id).vlc;
-				p = (e.pageX - rect.left) / (rect.right - rect.left);
-				$(obj).find(".wcp-progress-seen").css("width", (p*100)+"%");
-				vlc.position = p;
-			}
-			$(obj).find(".wcp-tooltip").hide(0);
-			$(obj).find(".wcp-time-current").text($(obj).find(".wcp-tooltip-inner").text());
-		});
+		if (window.document.webkitFullscreenElement != null) {
+			vlc = wjs("#"+window.document.webkitFullscreenElement.id).vlc;
+			p = e.pageX / window.document.webkitFullscreenElement.offsetWidth;
+			$(window.document.webkitFullscreenElement).find(".wcp-progress-seen").css("width", (p*100)+"%");
+			vlc.position = p;
+			$(window.document.webkitFullscreenElement).find(".wcp-tooltip").hide(0);
+			$(window.document.webkitFullscreenElement).find(".wcp-time-current").text($(window.document.webkitFullscreenElement).find(".wcp-tooltip-inner").text());
+		} else {
+			$('.webchimeras').each(function(i, obj) {
+				var rect = obj.getBoundingClientRect();
+				if (e.pageX >= rect.left && e.pageX <= rect.right && e.pageY >= rect.top && e.pageY <= rect.bottom) {
+					vlc = wjs("#"+$(obj).find(".wcp-wrapper")[0].id).vlc;
+					p = (e.pageX - rect.left) / (rect.right - rect.left);
+					$(obj).find(".wcp-progress-seen").css("width", (p*100)+"%");
+					vlc.position = p;
+				}
+				$(obj).find(".wcp-tooltip").hide(0);
+				$(obj).find(".wcp-time-current").text($(obj).find(".wcp-tooltip-inner").text());
+			});
+		}
 	}
 	if (volDrag) {
 		volDrag = false;
-		$('.webchimeras').each(function(i, obj) {
-			var rect = obj.getBoundingClientRect();
-			if (e.pageX >= rect.left && e.pageX <= rect.right) {
-				rect = $(obj).find(".wcp-vol-bar")[0].getBoundingClientRect();
-				if (e.pageX >= rect.right) {
-					p = 1;
-					offset = 116;
-					setTimeout(function() { $(obj).find(".wcp-vol-control").animate({ width: 0 },200); },1500);
-				} else if (e.pageX <= rect.left)  {
-					p = 0;
-					offset = 0;
-					setTimeout(function() { $(obj).find(".wcp-vol-control").animate({ width: 0 },200); },1500);
-				} else {
-					p = (e.pageX - rect.left) / (rect.right - rect.left);
-					offset = e.pageX - rect.left;
-					if (e.pageY < rect.top) setTimeout(function() { $(obj).find(".wcp-vol-control").animate({ width: 0 },200); },1500);
-					else if (e.pageY > rect.bottom) setTimeout(function() { $(obj).find(".wcp-vol-control").animate({ width: 0 },200); },1500);
-				}
-				if (offset) {
-					$(obj).find(".wcp-vol-bar-full").css("width", offset+"px");
-					if (offset > 116) offset = 116;
-					if (offset < 0) offset = 0;
-					vlc = wjs("#"+$(obj).find(".wcp-wrapper")[0].id).vlc;
-					vlc.volume = Math.floor(200* p);
-				}
+		if (window.document.webkitFullscreenElement != null) {
+			obj = window.document.webkitFullscreenElement;
+			rect = $(obj).find(".wcp-vol-bar")[0].getBoundingClientRect();
+			if (e.pageX >= rect.right) {
+				p = 1;
+				offset = 116;
+				setTimeout(function() { $(obj).find(".wcp-vol-control").animate({ width: 0 },200); },1500);
+			} else if (e.pageX <= rect.left)  {
+				p = 0;
+				offset = 0;
+				setTimeout(function() { $(obj).find(".wcp-vol-control").animate({ width: 0 },200); },1500);
+			} else {
+				p = (e.pageX - rect.left) / (rect.right - rect.left);
+				offset = e.pageX - rect.left;
+				if (e.pageY < rect.top) setTimeout(function() { $(obj).find(".wcp-vol-control").animate({ width: 0 },200); },1500);
+				else if (e.pageY > rect.bottom) setTimeout(function() { $(obj).find(".wcp-vol-control").animate({ width: 0 },200); },1500);
 			}
-		});
+			if (offset) {
+				$(obj).find(".wcp-vol-bar-full").css("width", offset+"px");
+				if (offset > 116) offset = 116;
+				if (offset < 0) offset = 0;
+				vlc = wjs("#"+obj.id).vlc;
+				vlc.volume = Math.floor(200* p);
+			}
+		} else {
+			$('.webchimeras').each(function(i, obj) {
+				var rect = obj.getBoundingClientRect();
+				if (e.pageX >= rect.left && e.pageX <= rect.right && e.pageY >= rect.top && e.pageY <= rect.bottom) {
+					rect = $(obj).find(".wcp-vol-bar")[0].getBoundingClientRect();
+					if (e.pageX >= rect.right) {
+						p = 1;
+						offset = 116;
+						setTimeout(function() { $(obj).find(".wcp-vol-control").animate({ width: 0 },200); },1500);
+					} else if (e.pageX <= rect.left)  {
+						p = 0;
+						offset = 0;
+						setTimeout(function() { $(obj).find(".wcp-vol-control").animate({ width: 0 },200); },1500);
+					} else {
+						p = (e.pageX - rect.left) / (rect.right - rect.left);
+						offset = e.pageX - rect.left;
+						if (e.pageY < rect.top) setTimeout(function() { $(obj).find(".wcp-vol-control").animate({ width: 0 },200); },1500);
+						else if (e.pageY > rect.bottom) setTimeout(function() { $(obj).find(".wcp-vol-control").animate({ width: 0 },200); },1500);
+					}
+					if (offset) {
+						$(obj).find(".wcp-vol-bar-full").css("width", offset+"px");
+						if (offset > 116) offset = 116;
+						if (offset < 0) offset = 0;
+						vlc = wjs("#"+$(obj).find(".wcp-wrapper")[0].id).vlc;
+						vlc.volume = Math.floor(200* p);
+					}
+				}
+			});
+		}
 	}
 }
 
 function mouseMoved(wjsPlayer,e) {
 	if (seekDrag) {
-		var rect = $(wjsPlayer.canvas).parent()[0].getBoundingClientRect();
-		if (e.pageX >= rect.left && e.pageX <= rect.right) {
-			p = (e.pageX - rect.left) / (rect.right - rect.left);
+		if (window.document.webkitFullscreenElement != null) {
+			p = e.pageX / window.document.webkitFullscreenElement.offsetWidth;
+			wjsPlayer = wjs("#"+window.document.webkitFullscreenElement.id);
 			$(wjsPlayer.canvas).parent().find(".wcp-progress-seen").css("width", (p*100)+"%");
-
-			var newtime = Math.floor(vlc.length * ((e.pageX - rect.left) / $(this).width()));
+			var newtime = Math.floor(vlc.length * (e.pageX / window.document.webkitFullscreenElement.offsetWidth));
 			if (newtime > 0) {
 				$(wjsPlayer.canvas).parent().find(".wcp-tooltip-inner").text(parseTime(newtime));
 				var offset = Math.floor($(wjsPlayer.canvas).parent().find(".wcp-tooltip").width() / 2);
-				if (e.pageX >= (offset + rect.left) && e.pageX <= (rect.right - offset)) {
-					$(wjsPlayer.canvas).parent().find(".wcp-tooltip").css("left",((e.pageX - rect.left) - offset)+"px");
-				} else if (e.pageX < (rect.left + offset)) $(wjsPlayer.canvas).parent().find(".wcp-tooltip").css("left",rect.left+"px");
-				else if (e.pageX > (rect.right - offset)) $(wjsPlayer.canvas).parent().find(".wcp-tooltip").css("left",(rect.right - $(".wcp-tooltip").width())+"px");
+				if (e.pageX >= (offset + 0) && e.pageX <= (window.document.webkitFullscreenElement.offsetWidth - offset)) {
+					$(wjsPlayer.canvas).parent().find(".wcp-tooltip").css("left",(e.pageX - offset)+"px");
+				} else if (e.pageX < (window.document.webkitFullscreenElement.offsetWidth + offset)) $(wjsPlayer.canvas).parent().find(".wcp-tooltip").css("left","0px");
+				else if (e.pageX > offset*(-1)) $(wjsPlayer.canvas).parent().find(".wcp-tooltip").css("left",(0 - $(".wcp-tooltip").width())+"px");
 				$(wjsPlayer.canvas).parent().find(".wcp-tooltip").show(0);
 			}
+			
+		} else {
+			var rect = $(wjsPlayer.canvas).parent()[0].getBoundingClientRect();
+			$('.webchimeras').each(function(i, obj) {
+				var rect = obj.getBoundingClientRect();
+				if (e.pageX >= rect.left && e.pageX <= rect.right && e.pageY >= rect.top && e.pageY <= rect.bottom) {
+					p = (e.pageX - rect.left) / (rect.right - rect.left);
+					wjsPlayer = wjs("#"+$(obj).find(".wcp-wrapper")[0].id);
+					$(wjsPlayer.canvas).parent().find(".wcp-progress-seen").css("width", (p*100)+"%");
+					var newtime = Math.floor(vlc.length * ((e.pageX - rect.left) / $(this).width()));
+					if (newtime > 0) {
+						$(wjsPlayer.canvas).parent().find(".wcp-tooltip-inner").text(parseTime(newtime));
+						var offset = Math.floor($(wjsPlayer.canvas).parent().find(".wcp-tooltip").width() / 2);
+						if (e.pageX >= (offset + rect.left) && e.pageX <= (rect.right - offset)) {
+							$(wjsPlayer.canvas).parent().find(".wcp-tooltip").css("left",((e.pageX - rect.left) - offset)+"px");
+						} else if (e.pageX < (rect.left + offset)) $(wjsPlayer.canvas).parent().find(".wcp-tooltip").css("left",rect.left+"px");
+						else if (e.pageX > (rect.right - offset)) $(wjsPlayer.canvas).parent().find(".wcp-tooltip").css("left",(rect.right - $(".wcp-tooltip").width())+"px");
+						$(wjsPlayer.canvas).parent().find(".wcp-tooltip").show(0);
+					}
+				}
+			});
 		}
 	}
 	if (volDrag) {
-		var rect = $(wjsPlayer.canvas).parent().find(".wcp-vol-bar")[0].getBoundingClientRect();
-		if (e.pageX >= rect.left && e.pageX <= rect.right) {
-			p = (e.pageX - rect.left) / (rect.right - rect.left);
-			$(wjsPlayer.canvas).parent().find(".wcp-vol-bar-full").css("width", Math.floor(p*116)+"px");
-			vlc = wjsPlayer.vlc;
-			vlc.volume = Math.floor(200* p);
+		if (window.document.webkitFullscreenElement != null) {
+			wjsPlayer = wjs("#"+window.document.webkitFullscreenElement.id);
+			var rect = $(wjsPlayer.canvas).parent().find(".wcp-vol-bar")[0].getBoundingClientRect();
+			if (e.pageX >= rect.left && e.pageX <= rect.right) {
+				p = (e.pageX - rect.left) / (rect.right - rect.left);
+				$(wjsPlayer.canvas).parent().find(".wcp-vol-bar-full").css("width", Math.floor(p*116)+"px");
+				vlc = wjsPlayer.vlc;
+				vlc.volume = Math.floor(200* p);
+			}
+		} else {
+			$('.webchimeras').each(function(i, obj) {
+				wjsPlayer = wjs("#"+$(obj).find(".wcp-wrapper")[0].id);
+				var rect = $(wjsPlayer.canvas).parent().find(".wcp-vol-bar")[0].getBoundingClientRect();
+				var rectWrapper = $(wjsPlayer.canvas).parents(".webchimeras")[0].getBoundingClientRect();
+				if (e.pageX >= rectWrapper.left && e.pageX <= rectWrapper.right && e.pageY >= rectWrapper.top && e.pageY <= rectWrapper.bottom) {
+					if (e.pageX >= rect.left && e.pageX <= rect.right) {
+						p = (e.pageX - rect.left) / (rect.right - rect.left);
+						$(wjsPlayer.canvas).parent().find(".wcp-vol-bar-full").css("width", Math.floor(p*116)+"px");
+						vlc = wjsPlayer.vlc;
+						vlc.volume = Math.floor(200* p);
+					}
+				}
+			});
 		}
 	}
 }
