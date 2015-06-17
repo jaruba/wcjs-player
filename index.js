@@ -208,8 +208,8 @@ wjs.prototype.addPlayer = function(wcpSettings,cb) {
 			if (wcpWrapper.webkitRequestFullscreen) wcpWrapper.webkitRequestFullscreen();
 			else if (wcpWrapper.requestFullscreen) wcpWrapper.requestFullscreen();
 			
-			if ($(this).parents(".wcp-wrapper").find(".wcp-maximize") > 0) {
-				switchClass($(this).parents(".wcp-wrapper").find(".wcp-maximize"),"wcp-maximize","wcp-minimize");
+			if ($(this).parents(".wcp-wrapper").find(".wcp-maximize").length > 0) {
+				switchClass($(this).parents(".wcp-wrapper").find(".wcp-maximize")[0],"wcp-maximize","wcp-minimize");
 			}
 		} else {
 			if (window.document.webkitCancelFullScreen) window.document.webkitCancelFullScreen();
