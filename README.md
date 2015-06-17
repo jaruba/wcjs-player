@@ -48,12 +48,12 @@ An Open Source Player for WebChimera.js (libvlc binding for node.js/io.js/NW.js/
 
 *JS*
 
-	var wcp = require("wcjs-player");
+	var wjs = require("wcjs-player");
 
-	var player = new wcp("#player1").addPlayer();
+	var player = new wjs("#player1").addPlayer();
 	player.vlc.play("http://archive.org/download/CrayonDragonAnAnimatedShortFilmByTonikoPantoja/Crayon%20Dragon%20-%20An%20animated%20short%20film%20by%20Toniko%20Pantoja.mp4");
 
-	var player2 = new wcp("#player2").addPlayer();
+	var player2 = new wjs("#player2").addPlayer();
 	player2.vlc.play("http://archive.org/download/CartoonClassics/Krazy_Kat_-_Keeping_Up_With_Krazy.mp4");
 	
 	// from here on you can either call the players with 'player' / 'player2' or 'wjs("#player1")' / 'wjs("#player2")'
