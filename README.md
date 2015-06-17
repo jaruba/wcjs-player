@@ -10,7 +10,9 @@ An Open Source Player for WebChimera.js (libvlc binding for node.js/io.js/NW.js/
 - ``npm install wcjs-player``
 
 **API:**
-- ``wjs(element).addPlayer(cb)`` - adds the player to any element of the page
+- ``wjs(element).addPlayer(parameters,cb)`` - adds the player to any element of the page
+
+ --- ``parameters`` - optional JSON object containing either ``id`` (string, defaults to "webchimera", "webchimera2", etc., used for the selection of the player after it is created, ie: ``wjs("#webchimera")`` ) or ``multiscreen`` (boolean, defaults to "false", [see multiscreen demo](https://github.com/jaruba/node-vlc-multiscreen/))
 - ``wjs(element).vlc`` - holds the [WebChimera.js API](https://github.com/RSATom/WebChimera.js/wiki/JS-API)
 
 **Usage Example 1:**
