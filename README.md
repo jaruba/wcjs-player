@@ -71,3 +71,7 @@ WebChimera.js Player running on NW.js (Windows)
 WebChimera.js Player running on Electron (Mac)
 
 <img src="http://webchimera.org/samples/wcjs-player-2.png">
+
+WebChimera.js Player Multiscreen Demo running on NW.js (Windows)
+
+<img src="http://webchimera.org/samples/wcjs-player-multiscreen.png">
