@@ -416,7 +416,9 @@ wjs.prototype.addPlayer = function(wcpSettings) {
 	vlcs[newid].hideUI = setTimeout(function(i) { return function() { wcp_hideUI($(i).parent()); } }(newid),6000);
 	vlcs[newid].timestampUI = 0;
 	vlcs[newid].renderer = require("wcjs-renderer");
-	vlcs[newid].vlc = vlcs[newid].renderer.init(wjs(newid).canvas);
+	
+	if (wcpSettings && wcpSettings["vlcArgs"]) vlcs[newid].vlc = vlcs[newid].renderer.init(wjs(newid).canvas,wcpSettings["vlcArgs"]);
+	else vlcs[newid].vlc = vlcs[newid].renderer.init(wjs(newid).canvas);
 	
 	vlcs[newid].vlc.onFrameSetup = function(i) {
 		return function(width, height, pixelFormat, videoFrame) {
