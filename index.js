@@ -823,6 +823,45 @@ function mouseMoved(wjsPlayer,e) {
 	}
 }
 
+// event proxies
+wjs.prototype.onMediaChanged = function(wjs_function) { this.catchEvent("MediaChanged",wjs_function); return this; }
+wjs.prototype.onIdle = function(wjs_function) { this.catchEvent("NothingSpecial",wjs_function); return this; }
+wjs.prototype.onOpening = function(wjs_function) { this.catchEvent("Opening",wjs_function); return this; }
+wjs.prototype.onIdle = function(wjs_function) { this.catchEvent("NothingSpecial",wjs_function); return this; }
+wjs.prototype.onBuffering = function(wjs_function) { this.catchEvent("Buffering",wjs_function); return this; }
+wjs.prototype.onPlaying = function(wjs_function) { this.catchEvent("Playing",wjs_function); return this; }
+wjs.prototype.onPaused = function(wjs_function) { this.catchEvent("Paused",wjs_function); return this; }
+wjs.prototype.onForward = function(wjs_function) { this.catchEvent("Forward",wjs_function); return this; }
+wjs.prototype.onBackward = function(wjs_function) { this.catchEvent("Backward",wjs_function); return this; }
+wjs.prototype.onError = function(wjs_function) { this.catchEvent("EncounteredError",wjs_function); return this; }
+wjs.prototype.onEnded = function(wjs_function) { this.catchEvent("EndReached",wjs_function); return this; }
+wjs.prototype.onStopped = function(wjs_function) { this.catchEvent("Stopped",wjs_function); return this; }
+wjs.prototype.onTime = function(wjs_function) { this.catchEvent("TimeChanged",wjs_function); return this; }
+wjs.prototype.onPosition = function(wjs_function) { this.catchEvent("PositionChanged",wjs_function); return this; }
+// end event proxies
+
+// catch event function
+wjs.prototype.catchEvent = function(wjs_event,wjs_function) {
+	var saveContext = wjs(this.context);
+	if (this.vlc.attachEvent) {
+		// Microsoft
+		this.vlc.attachEvent("on"+wjs_event, function(event) {
+			return wjs_function.call(saveContext,event);
+		});
+	} else if (this.vlc.addEventListener) {
+		// Mozilla: DOM level 2
+		this.vlc.addEventListener(wjs_event, function(event) {
+			return wjs_function.call(saveContext,event);
+		}, false);
+	} else {
+		// DOM level 0
+		this.vlc["on"+wjs_event] = function(event) {
+			return wjs_function.call(saveContext,event);
+		};
+	}
+	return this;
+};
+// end catch event function
 
 // html element selector
 function sel(context) {
