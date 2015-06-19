@@ -466,6 +466,56 @@ wjs.prototype.addPlayer = function(wcpSettings) {
 	return new wjs(newid);
 };
 
+// function to add playlist items
+wjs.prototype.addPlaylist = function(playlist) {
+	 // convert all strings to json object
+	 if (Array.isArray(playlist) === true) {
+		 var item = 0;
+		 for (item = 0; typeof playlist[item] !== 'undefined'; item++) {
+			 if (typeof playlist[item] === 'string') {
+				 var tempPlaylist = playlist[item];
+				 delete playlist[item];
+				 playlist[item] = {
+					url: tempPlaylist
+				 };
+			 }
+		 }
+	 } else if (typeof playlist === 'string') {		 
+		 var tempPlaylist = playlist;
+		 delete playlist;
+		 playlist = [];
+		 playlist.push({
+			url: tempPlaylist
+		 });
+		 delete tempPlaylist;
+	 } else if (typeof playlist === 'object') {
+		 var tempPlaylist = playlist;
+		 delete playlist;
+		 playlist = [];
+		 playlist.push(tempPlaylist);
+		 delete tempPlaylist;
+	 }
+	 // end convert all strings to json object
+
+	 if (Array.isArray(playlist) === true && typeof playlist[0] === 'object') {
+		 var item = 0;
+		 for (item = 0; item < playlist.length; item++) {
+			  if (playlist[item].vlcArgs) {
+				  if (!Array.isArray(playlist[item].vlcArgs)) {
+					  if (playlist[item].vlcArgs.indexOf(" ") > -1) {
+						  playlist[item].vlcArgs = playlist[item].vlcArgs.split(" ");
+					  } else playlist[item].vlcArgs = [playlist[item].vlcArgs];
+				  }
+				  this.vlc.playlist.addWithOptions(playlist[item].url,playlist[item].vlcArgs);
+			  } else this.vlc.playlist.add(playlist[item].url);
+		  }
+	 }
+	// needs to refresh Playlist Menu items in the future
+
+	return this;
+};
+// end function to add playlist items
+
 wjs.prototype.mute = function(newMute) {
 	if (typeof newMute === "boolean") {
 		if (this.vlc.mute !== newMute) {
