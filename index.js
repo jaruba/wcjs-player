@@ -893,22 +893,7 @@ wjs.prototype.onPosition = function(wjs_function) { this.catchEvent("PositionCha
 // catch event function
 wjs.prototype.catchEvent = function(wjs_event,wjs_function) {
 	var saveContext = wjs(this.context);
-	if (this.vlc.attachEvent) {
-		// Microsoft
-		this.vlc.attachEvent("on"+wjs_event, function(event) {
-			return wjs_function.call(saveContext,event);
-		});
-	} else if (this.vlc.addEventListener) {
-		// Mozilla: DOM level 2
-		this.vlc.addEventListener(wjs_event, function(event) {
-			return wjs_function.call(saveContext,event);
-		}, false);
-	} else {
-		// DOM level 0
-		this.vlc["on"+wjs_event] = function(event) {
-			return wjs_function.call(saveContext,event);
-		};
-	}
+	this.vlc.events.on(wjs_event, function(event) { return wjs_function.call(saveContext,event); } );
 	return this;
 };
 // end catch event function
