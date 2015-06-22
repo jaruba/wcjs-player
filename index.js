@@ -190,7 +190,7 @@ wjs.prototype.addPlayer = function(wcpSettings) {
 		vlcs[newid].multiscreen = false;
 	}
 
-	playerbody = '<div' + targetid + ' style="height: 100%"><canvas class="wcp-canvas wcp-center"></canvas><div class="wcp-surface"></div><div class="wcp-pause-anim wcp-center"><i class="wcp-anim-basic wcp-anim-icon-play"></i></div><div class="wcp-toolbar"><div class="wcp-toolbar-background"></div><div class="wcp-progress-bar"><div class="wcp-progress-seen"></div><div class="wcp-progress-pointer"></div></div><div class="wcp-button wcp-left wcp-pause"></div><div class="wcp-button wcp-left wcp-vol-button wcp-volume-medium"></div><div class="wcp-vol-control"><div class="wcp-vol-bar"><div class="wcp-vol-bar-full"></div><div class="wcp-vol-bar-pointer"></div></div></div><div class="wcp-time"><span class="wcp-time-current">00:00</span> / <span class="wcp-time-total">00:00</span></div><div class="wcp-button wcp-right wcp-maximize"></div></div><div class="wcp-status"></div><div class="wcp-tooltip"><div class="wcp-tooltip-arrow"></div><div class="wcp-tooltip-inner">00:00</div></div></div>';
+	playerbody = '<div' + targetid + ' style="height: 100%"><canvas class="wcp-canvas wcp-center"></canvas><div class="wcp-surface"></div><div class="wcp-pause-anim wcp-center"><i class="wcp-anim-basic wcp-anim-icon-play"></i></div><div class="wcp-toolbar"><div class="wcp-toolbar-background"></div><div class="wcp-progress-bar"><div class="wcp-progress-seen"></div><div class="wcp-progress-pointer"></div></div><div class="wcp-button wcp-left wcp-prev" style="display: none"></div><div class="wcp-button wcp-left wcp-pause"></div><div class="wcp-button wcp-left wcp-next" style="display: none"></div><div class="wcp-button wcp-left wcp-vol-button wcp-volume-medium"></div><div class="wcp-vol-control"><div class="wcp-vol-bar"><div class="wcp-vol-bar-full"></div><div class="wcp-vol-bar-pointer"></div></div></div><div class="wcp-time"><span class="wcp-time-current">00:00</span> / <span class="wcp-time-total">00:00</span></div><div class="wcp-button wcp-right wcp-maximize"></div></div><div class="wcp-status"></div><div class="wcp-tooltip"><div class="wcp-tooltip-arrow"></div><div class="wcp-tooltip-inner">00:00</div></div></div>';
 	
 	$(this.context).each(function(ij,el) { if (!hasClass(el,"webchimeras")) $(el).addClass("webchimeras"); el.innerHTML = playerbody; });
 	
@@ -241,6 +241,28 @@ wjs.prototype.addPlayer = function(wcpSettings) {
 				vlc.play();
 				switchClass(this,"wcp-replay","wcp-pause");
 				$(this).parents(".wcp-wrapper").find(".wcp-progress-seen").css("width","0%");
+				$(this).parents(".wcp-wrapper").find(".wcp-time-current").text("00:00");
+			} else if (buttonClass == "wcp-prev") {
+				wjs_button = $(this).parents(".wcp-wrapper").find(".wcp-play");
+				if (wjs_button.length != 0) wjs_button.removeClass("wcp-play").addClass("wcp-pause");
+			
+				wjs_button = $(this).parents(".wcp-wrapper").find(".wcp-replay");
+				if (wjs_button.length != 0) wjs_button.removeClass("wcp-replay").addClass("wcp-pause");
+			
+				vlc.playlist.prev();
+				
+				positionChanged(wjsPlayer,0);
+				$(this).parents(".wcp-wrapper").find(".wcp-time-current").text("00:00");
+			} else if (buttonClass == "wcp-next") {
+				wjs_button = $(this).parents(".wcp-wrapper").find(".wcp-play");
+				if (wjs_button.length != 0) wjs_button.removeClass("wcp-play").addClass("wcp-pause");
+			
+				wjs_button = $(this).parents(".wcp-wrapper").find(".wcp-replay");
+				if (wjs_button.length != 0) wjs_button.removeClass("wcp-replay").addClass("wcp-pause");
+			
+				vlc.playlist.next();
+				
+				positionChanged(wjsPlayer,0);
 				$(this).parents(".wcp-wrapper").find(".wcp-time-current").text("00:00");
 			} else if (["wcp-volume-low","wcp-volume-medium","wcp-volume-high"].indexOf(buttonClass) > -1) {
 				switchClass(this,buttonClass,"wcp-mute");
@@ -468,6 +490,10 @@ wjs.prototype.addPlayer = function(wcpSettings) {
 
 // function to add playlist items
 wjs.prototype.addPlaylist = function(playlist) {
+	 if (this.itemCount() > 0) {
+		 $(this.canvas).parent().find(".wcp-prev").show(0);
+		 $(this.canvas).parent().find(".wcp-next").show(0);
+	 }
 	 // convert all strings to json object
 	 if (Array.isArray(playlist) === true) {
 		 var item = 0;
@@ -599,7 +625,12 @@ wjs.prototype.advanceItem = function(newX,newY) {
 
 wjs.prototype.removeItem = function(remItem) {
 	if (typeof remItem === 'number') {
-		this.vlc.removeItem(remItem);
+		 if (this.itemCount() <= 2) {
+			 if (this.vlc.removeItem(remItem)) {
+				 $(this.canvas).parent().find(".wcp-prev").hide(0);
+				 $(this.canvas).parent().find(".wcp-next").hide(0);
+			 }
+		 } else this.vlc.removeItem(remItem);
 		// needs to refresh Playlist Menu items in the future
 	} else return false;
 	return this;
