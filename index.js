@@ -634,11 +634,11 @@ wjs.prototype.advanceItem = function(newX,newY) {
 wjs.prototype.removeItem = function(remItem) {
 	if (typeof remItem === 'number') {
 		 if (this.itemCount() <= 2) {
-			 if (this.vlc.removeItem(remItem)) {
+			 if (this.vlc.playlist.removeItem(remItem)) {
 				 $(this.canvas).parent().find(".wcp-prev").hide(0);
 				 $(this.canvas).parent().find(".wcp-next").hide(0);
 			 }
-		 } else this.vlc.removeItem(remItem);
+		 } else this.vlc.playlist.removeItem(remItem);
 		// needs to refresh Playlist Menu items in the future
 	} else return false;
 	return this;
