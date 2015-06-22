@@ -908,7 +908,6 @@ function mouseMoved(wjsPlayer,e) {
 wjs.prototype.onMediaChanged = function(wjs_function) { this.catchEvent("MediaChanged",wjs_function); return this; }
 wjs.prototype.onIdle = function(wjs_function) { this.catchEvent("NothingSpecial",wjs_function); return this; }
 wjs.prototype.onOpening = function(wjs_function) { this.catchEvent("Opening",wjs_function); return this; }
-wjs.prototype.onIdle = function(wjs_function) { this.catchEvent("NothingSpecial",wjs_function); return this; }
 wjs.prototype.onBuffering = function(wjs_function) { this.catchEvent("Buffering",wjs_function); return this; }
 wjs.prototype.onPlaying = function(wjs_function) { this.catchEvent("Playing",wjs_function); return this; }
 wjs.prototype.onPaused = function(wjs_function) { this.catchEvent("Paused",wjs_function); return this; }
