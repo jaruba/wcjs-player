@@ -615,6 +615,14 @@ wjs.prototype.stateInt = function() {
 	return this.vlc.state;
 }
 
+wjs.prototype.width = function() {
+	return this.canvas.width;
+}
+
+wjs.prototype.height = function() {
+	return this.canvas.height;
+}
+
 wjs.prototype.advanceItem = function(newX,newY) {
 	if (typeof newX === 'number' && typeof newY === 'number') {
 		this.vlc.playlist.advanceItem(newX,newY);
