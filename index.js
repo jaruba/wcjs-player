@@ -585,6 +585,7 @@ wjs.prototype.addPlaylist = function(playlist) {
 				  }
 				  this.vlc.playlist.addWithOptions(playlist[item].url,playlist[item].vlcArgs);
 			  } else this.vlc.playlist.add(playlist[item].url);
+			  if (playlist[item].title) this.vlc.playlist.items[this.vlc.playlist.itemCount-1].title = "[custom]"+playlist[item].title;
 		  }
 	 }
 	 if (this.state() == "idle") {
@@ -600,8 +601,6 @@ wjs.prototype.addPlaylist = function(playlist) {
 	printPlaylist(this);
 	
 	// show playlist button if multiple playlist items
-	console.log("llll");
-	console.log(this.vlc.playlist.itemCount);
 	if (this.vlc.playlist.itemCount > 1) {
 		$(this.canvas).parents(".wcp-wrapper").find(".wcp-playlist-but").css({ display: "block" });
 	}
