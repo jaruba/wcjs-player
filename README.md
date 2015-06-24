@@ -21,10 +21,9 @@ An Open Source Player for WebChimera.js (libvlc binding for node.js/io.js/NW.js/
 *JS*
 
 	var wjs = require("wcjs-player");
-	var player = new wjs("#player").addPlayer();
+	var player = new wjs("#player").addPlayer({ autoplay: true });
 
 	player.addPlaylist("http://archive.org/download/CartoonClassics/Krazy_Kat_-_Keeping_Up_With_Krazy.mp4");
-	player.play();
 
 	// from here on you can either call the player with 'player' or 'wjs("#player")'
 
@@ -48,14 +47,12 @@ An Open Source Player for WebChimera.js (libvlc binding for node.js/io.js/NW.js/
 
 	var wjs = require("wcjs-player");
 
-	var player = new wjs("#player1").addPlayer();
+	var player = new wjs("#player1").addPlayer({ autoplay: true });
 	player.addPlaylist("http://archive.org/download/CrayonDragonAnAnimatedShortFilmByTonikoPantoja/Crayon%20Dragon%20-%20An%20animated%20short%20film%20by%20Toniko%20Pantoja.mp4");
-	player.play();
 
-	var player2 = new wjs("#player2").addPlayer();
+	var player2 = new wjs("#player2").addPlayer({ autoplay: true });
 	player2.addPlaylist("http://archive.org/download/CartoonClassics/Krazy_Kat_-_Keeping_Up_With_Krazy.mp4");
-	player2.play();
-	
+
 	// from here on you can either call the players with 'player' / 'player2' or 'wjs("#player1")' / 'wjs("#player2")'
 
 
