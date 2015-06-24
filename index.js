@@ -26,8 +26,15 @@ var vlcs = {},
 	firstTime = true;
 		
 		
-if (!$("link[href='"+__dirname.replace("\\","/")+"/public/general.css']").length)
-$('<link href="'+__dirname.replace("\\","/")+'/public/general.css" rel="stylesheet">').appendTo("head");
+if (!$("link[href='"+__dirname.replace("\\","/")+"/public/general.css']").length) {
+	// inject stylesheet
+	$('<link href="'+__dirname.replace("\\","/")+'/public/general.css" rel="stylesheet">').appendTo("head");
+	
+	// inject scrollbar css
+	window.document.styleSheets[0].addRule('.wcp-playlist-items::-webkit-scrollbar','width: 44px;');
+	window.document.styleSheets[0].addRule('.wcp-playlist-items::-webkit-scrollbar-track','background-color: #696969; border-right: 13px solid rgba(0, 0, 0, 0); border-left: 21px solid rgba(0, 0, 0, 0); background-clip: padding-box;');
+	window.document.styleSheets[0].addRule('.wcp-playlist-items::-webkit-scrollbar-thumb','background-color: #e5e5e5; border-right: 13px solid rgba(0, 0, 0, 0); border-left: 21px solid rgba(0, 0, 0, 0); background-clip: padding-box;');
+}
 
 function wjs(context) {
 	
@@ -119,6 +126,9 @@ wjs.prototype.playItem = function(i) {
 		if (wjs_button.length != 0) wjs_button.removeClass("wcp-replay").addClass("wcp-pause");
 
 		this.vlc.playlist.playItem(i);
+
+		positionChanged(this,0);
+		$(this.canvas).parents(".wcp-wrapper").find(".wcp-time-current").text("00:00");
 	} else return false;
 	return this;
 };
@@ -197,9 +207,9 @@ wjs.prototype.addPlayer = function(wcpSettings) {
 	opts[newid].lastItem = -1;
 	if (typeof opts[newid].allowFullscreen === 'undefined') opts[newid].allowFullscreen = true;
 
-	playerbody = '<div' + targetid + ' style="height: 100%"><canvas class="wcp-canvas wcp-center"></canvas><div class="wcp-surface"></div><div class="wcp-pause-anim wcp-center"><i class="wcp-anim-basic wcp-anim-icon-play"></i></div><div class="wcp-toolbar"><div class="wcp-toolbar-background"></div><div class="wcp-progress-bar"><div class="wcp-progress-seen"></div><div class="wcp-progress-pointer"></div></div><div class="wcp-button wcp-left wcp-prev" style="display: none"></div><div class="wcp-button wcp-left wcp-pause"></div><div class="wcp-button wcp-left wcp-next" style="display: none"></div><div class="wcp-button wcp-left wcp-vol-button wcp-volume-medium"></div><div class="wcp-vol-control"><div class="wcp-vol-bar"><div class="wcp-vol-bar-full"></div><div class="wcp-vol-bar-pointer"></div></div></div><div class="wcp-time"><span class="wcp-time-current">00:00</span> / <span class="wcp-time-total">00:00</span></div><div class="wcp-button wcp-right wcp-maximize"';
+	playerbody = '<div' + targetid + ' style="height: 100%"><canvas class="wcp-canvas wcp-center"></canvas><div class="wcp-surface"></div><div class="wcp-playlist wcp-center"><div class="wcp-playlist-close"></div><div class="wcp-playlist-title">Playlist Menu</div><div class="wcp-playlist-items"></div></div><div class="wcp-pause-anim wcp-center"><i class="wcp-anim-basic wcp-anim-icon-play"></i></div><div class="wcp-toolbar"><div class="wcp-toolbar-background"></div><div class="wcp-progress-bar"><div class="wcp-progress-seen"></div><div class="wcp-progress-pointer"></div></div><div class="wcp-button wcp-left wcp-prev" style="display: none"></div><div class="wcp-button wcp-left wcp-pause"></div><div class="wcp-button wcp-left wcp-next" style="display: none"></div><div class="wcp-button wcp-left wcp-vol-button wcp-volume-medium"></div><div class="wcp-vol-control"><div class="wcp-vol-bar"><div class="wcp-vol-bar-full"></div><div class="wcp-vol-bar-pointer"></div></div></div><div class="wcp-time"><span class="wcp-time-current">00:00</span> / <span class="wcp-time-total">00:00</span></div><div class="wcp-button wcp-right wcp-maximize"';
 	if (!opts[newid].allowFullscreen) playerbody += ' style="cursor: not-allowed; color: rgba(123,123,123,0.6);"';
-	playerbody += '></div></div><div class="wcp-status"></div><div class="wcp-tooltip"><div class="wcp-tooltip-arrow"></div><div class="wcp-tooltip-inner">00:00</div></div></div>';
+	playerbody += '></div><div class="wcp-button wcp-right wcp-playlist-but"></div></div><div class="wcp-status"></div><div class="wcp-tooltip"><div class="wcp-tooltip-arrow"></div><div class="wcp-tooltip-inner">00:00</div></div></div>';
 	
 	$(this.context).each(function(ij,el) { if (!hasClass(el,"webchimeras")) $(el).addClass("webchimeras"); el.innerHTML = playerbody; });
 	
@@ -227,11 +237,23 @@ wjs.prototype.addPlayer = function(wcpSettings) {
 		}(newid));
 	}
 
+	$(wjs(newid).canvas).parent().find(".wcp-playlist-close").click(function() {
+		$(this).parents(".wcp-wrapper").find(".wcp-playlist").hide(0);
+	});
+
 	// toolbar button actions
 	$(wjs(newid).canvas).parent().find(".wcp-button").click(function() {
 		wjsPlayer = wjs("#"+$(this).parents(".wcp-wrapper")[0].id);
 		vlc = wjsPlayer.vlc;
 		buttonClass = this.className.replace("wcp-button","").replace("wcp-left","").replace("wcp-vol-button","").replace("wcp-right","").split(" ").join("");
+		if (buttonClass == "wcp-playlist-but") {
+			if ($(this).parents(".wcp-wrapper").find(".wcp-playlist").is(":visible")) {
+				$(this).parents(".wcp-wrapper").find(".wcp-playlist").hide(0);
+			} else {
+				printPlaylist(wjs("#"+$(this).parents(".wcp-wrapper")[0].id));
+				$(this).parents(".wcp-wrapper").find(".wcp-playlist").show(0);
+			}
+		}
 		if ([3,4,6].indexOf(vlc.state) > -1) {
 			if (buttonClass == "wcp-play") {
 				switchClass($(this).parents(".wcp-wrapper").find(".wcp-anim-basic")[0],"wcp-anim-icon-pause","wcp-anim-icon-play");
@@ -575,6 +597,14 @@ wjs.prototype.addPlaylist = function(playlist) {
 		}
 	 }
 	// needs to refresh Playlist Menu items in the future
+	printPlaylist(this);
+	
+	// show playlist button if multiple playlist items
+	console.log("llll");
+	console.log(this.vlc.playlist.itemCount);
+	if (this.vlc.playlist.itemCount > 1) {
+		$(this.canvas).parents(".wcp-wrapper").find(".wcp-playlist-but").css({ display: "block" });
+	}
 
 	return this;
 };
@@ -665,6 +695,7 @@ wjs.prototype.advanceItem = function(newX,newY) {
 	if (typeof newX === 'number' && typeof newY === 'number') {
 		this.vlc.playlist.advanceItem(newX,newY);
 		// needs to refresh Playlist Menu items in the future
+		printPlaylist(this);
 	} else return false;
 	return this;
 }
@@ -678,6 +709,11 @@ wjs.prototype.removeItem = function(remItem) {
 			 }
 		 } else this.vlc.playlist.removeItem(remItem);
 		// needs to refresh Playlist Menu items in the future
+		printPlaylist(this);
+		// hide playlist button if less then 2 playlist items
+		if (this.vlc.playlist.itemCount < 2) {
+			$(this.canvas).parents(".wcp-wrapper").find(".wcp-playlist-but").css({ display: "none" });
+		}
 	} else return false;
 	return this;
 }
@@ -687,6 +723,10 @@ wjs.prototype.clearPlaylist = function() {
 	this.vlc.playlist.clear();
 	$(this.canvas).parent().find(".wcp-time-total").text("00:00");
 	// needs to refresh Playlist Menu items in the future
+	printPlaylist(this);
+	if ($(this.canvas).parents(".wcp-wrapper").find(".wcp-playlist-but").is(":visible")) {
+		$(this.canvas).parents(".wcp-wrapper").find(".wcp-playlist-but").hide(0);
+	}
 	return this;
 }
 
@@ -1163,6 +1203,66 @@ function wcp_hideUI(wjsWrapper) {
 		wjsWrapper.find(".wcp-tooltip").stop().fadeOut();
 		wjsWrapper.css({cursor: 'none'});
 	}
+}
+
+function printPlaylist(wjsPlayer) {
+	playlistItems = $(wjsPlayer.canvas).parents(".wcp-wrapper").find(".wcp-playlist-items");
+	vlc = vlcs["#"+$(wjsPlayer.canvas).parents(".wcp-wrapper")[0].id].vlc;
+	oi = 0;
+	if (vlc.playlist.itemCount > 0) {
+		generatePlaylist = "";
+		for (oi = 0; oi < vlc.playlist.itemCount; oi++) {
+			if (vlc.playlist.items[oi].title.indexOf("[custom]") != 0) {
+				var plstring = vlc.playlist.items[oi].title;
+				if (plstring.indexOf("http://") == 0) {
+					// extract filename from url
+					var tempPlstring = plstring.substring(plstring.lastIndexOf('/')+1);
+					if (tempPlstring.length > 3) plstring = tempPlstring;
+					delete tempPlstring;
+				}
+				if (plstring.indexOf(".") > -1) {
+					// remove extension
+					var tempPlstring = plstring.replace("."+plstring.split('.').pop(),"");
+					if (tempPlstring.length > 3) plstring = tempPlstring;
+					delete tempPlstring;
+				}
+				plstring = unescape(plstring);
+				plstring = plstring.split('_').join(' ');
+				plstring = plstring.split('.').join(' ');
+				plstring = plstring.split('  ').join(' ');
+				plstring = plstring.split('  ').join(' ');
+				plstring = plstring.split('  ').join(' ');
+				
+				// capitalize first letter
+				plstring = plstring.charAt(0).toUpperCase() + plstring.slice(1);
+	
+				if (plstring != vlc.playlist.items[oi].title) vlc.playlist.items[oi].title = "[custom]"+plstring;
+			}
+			generatePlaylist += '<div class="wcp-playlist-item';
+			if (oi == vlc.playlist.currentItem) generatePlaylist += ' wcp-playlist-selected';
+			generatePlaylist += '" data-item="'+oi+'">'+vlc.playlist.items[oi].title.replace("[custom]","")+'</div>';
+		}
+		playlistItems.css('overflowY', 'scroll');
+		playlistItems.html("");
+		playlistItems.html(generatePlaylist);
+		if (playlistItems.outerHeight() <= (oi* parseInt(playlistItems.find(".wcp-playlist-item").css("height")))) {
+			playlistItems.css("cursor","pointer");
+		} else playlistItems.css("cursor","default");
+		$(wjsPlayer.canvas).parents(".wcp-wrapper").find(".wcp-playlist-item").click(function() {
+			wjs_button = $(wjs("#"+$(this).parents(".wcp-wrapper")[0].id).canvas).parents(".wcp-wrapper").find(".wcp-play");
+			if (wjs_button.length != 0) wjs_button.removeClass("wcp-play").addClass("wcp-pause");
+			
+			wjs_button = $(wjs("#"+$(this).parents(".wcp-wrapper")[0].id).canvas).parents(".wcp-wrapper").find(".wcp-replay");
+			if (wjs_button.length != 0) wjs_button.removeClass("wcp-replay").addClass("wcp-pause");
+			
+			positionChanged(wjs("#"+$(this).parents(".wcp-wrapper")[0].id),0);
+			$(wjs("#"+$(this).parents(".wcp-wrapper")[0].id).canvas).parents(".wcp-wrapper").find(".wcp-time-current").text("00:00");
+			
+			vlcs["#"+$(this).parents(".wcp-wrapper")[0].id].vlc.playlist.playItem(parseInt(this.getAttribute('data-item')));
+			printPlaylist(wjs("#"+$(this).parents(".wcp-wrapper")[0].id));
+		});
+		
+	} else playlistItems.html("");
 }
 
 module.exports = wjs;
