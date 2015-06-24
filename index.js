@@ -19,6 +19,7 @@
 // WebChimera.js Player v0.2.7
 
 var vlcs = {},
+	opts = {},
 	$ = require('jquery'),
 	seekDrag = false,
 	volDrag = false,
@@ -59,6 +60,7 @@ function wjs(context) {
 			this.video.pixelFormat = vlcs[this.context].pixelFormat;
 		}
 	}
+	if (opts[this.context]) this.opts = opts[this.context];
 	
 	return this;
 };
@@ -184,13 +186,20 @@ wjs.prototype.addPlayer = function(wcpSettings) {
 	} else { var targetid = ' id="webchimera" class="wcp-wrapper"'; newid = "#webchimera"; }
 	
 	vlcs[newid] = {};
+
 	if (wcpSettings) {
+		opts[newid] = wcpSettings;
 		vlcs[newid].multiscreen = (typeof wcpSettings["multiscreen"] === "undefined") ? false : wcpSettings["multiscreen"];
 	} else {
+		opts[newid] = {};
 		vlcs[newid].multiscreen = false;
 	}
+	opts[newid].lastItem = -1;
+	if (typeof opts[newid].allowFullscreen === 'undefined') opts[newid].allowFullscreen = true;
 
-	playerbody = '<div' + targetid + ' style="height: 100%"><canvas class="wcp-canvas wcp-center"></canvas><div class="wcp-surface"></div><div class="wcp-pause-anim wcp-center"><i class="wcp-anim-basic wcp-anim-icon-play"></i></div><div class="wcp-toolbar"><div class="wcp-toolbar-background"></div><div class="wcp-progress-bar"><div class="wcp-progress-seen"></div><div class="wcp-progress-pointer"></div></div><div class="wcp-button wcp-left wcp-prev" style="display: none"></div><div class="wcp-button wcp-left wcp-pause"></div><div class="wcp-button wcp-left wcp-next" style="display: none"></div><div class="wcp-button wcp-left wcp-vol-button wcp-volume-medium"></div><div class="wcp-vol-control"><div class="wcp-vol-bar"><div class="wcp-vol-bar-full"></div><div class="wcp-vol-bar-pointer"></div></div></div><div class="wcp-time"><span class="wcp-time-current">00:00</span> / <span class="wcp-time-total">00:00</span></div><div class="wcp-button wcp-right wcp-maximize"></div></div><div class="wcp-status"></div><div class="wcp-tooltip"><div class="wcp-tooltip-arrow"></div><div class="wcp-tooltip-inner">00:00</div></div></div>';
+	playerbody = '<div' + targetid + ' style="height: 100%"><canvas class="wcp-canvas wcp-center"></canvas><div class="wcp-surface"></div><div class="wcp-pause-anim wcp-center"><i class="wcp-anim-basic wcp-anim-icon-play"></i></div><div class="wcp-toolbar"><div class="wcp-toolbar-background"></div><div class="wcp-progress-bar"><div class="wcp-progress-seen"></div><div class="wcp-progress-pointer"></div></div><div class="wcp-button wcp-left wcp-prev" style="display: none"></div><div class="wcp-button wcp-left wcp-pause"></div><div class="wcp-button wcp-left wcp-next" style="display: none"></div><div class="wcp-button wcp-left wcp-vol-button wcp-volume-medium"></div><div class="wcp-vol-control"><div class="wcp-vol-bar"><div class="wcp-vol-bar-full"></div><div class="wcp-vol-bar-pointer"></div></div></div><div class="wcp-time"><span class="wcp-time-current">00:00</span> / <span class="wcp-time-total">00:00</span></div><div class="wcp-button wcp-right wcp-maximize"';
+	if (!opts[newid].allowFullscreen) playerbody += ' style="cursor: not-allowed; color: rgba(123,123,123,0.6);"';
+	playerbody += '></div></div><div class="wcp-status"></div><div class="wcp-tooltip"><div class="wcp-tooltip-arrow"></div><div class="wcp-tooltip-inner">00:00</div></div></div>';
 	
 	$(this.context).each(function(ij,el) { if (!hasClass(el,"webchimeras")) $(el).addClass("webchimeras"); el.innerHTML = playerbody; });
 	
@@ -295,10 +304,12 @@ wjs.prototype.addPlayer = function(wcpSettings) {
 				}
 			}
 		} else if (buttonClass == "wcp-maximize") {
-			wcpWrapper = $(this).parents(".wcp-wrapper")[0];
-			if (wcpWrapper.webkitRequestFullscreen) wcpWrapper.webkitRequestFullscreen();
-			else if (wcpWrapper.requestFullscreen) wcpWrapper.requestFullscreen();
-			switchClass(this,"wcp-maximize","wcp-minimize");
+			if (wjs("#"+$(this).parents(".wcp-wrapper")[0].id).opts.allowFullscreen) {
+				wcpWrapper = $(this).parents(".wcp-wrapper")[0];
+				if (wcpWrapper.webkitRequestFullscreen) wcpWrapper.webkitRequestFullscreen();
+				else if (wcpWrapper.requestFullscreen) wcpWrapper.requestFullscreen();
+				switchClass(this,"wcp-maximize","wcp-minimize");
+			}
 		}
 	});
 	
@@ -345,29 +356,31 @@ wjs.prototype.addPlayer = function(wcpSettings) {
 	});
 	
 	$(wjs(newid).canvas).parent().find(".wcp-surface").dblclick(function() {
-		$(this).parents(".wcp-wrapper").find(".wcp-anim-basic").finish();
-		$(this).parents(".wcp-wrapper").find(".wcp-pause-anim").finish();
-		if (window.document.webkitFullscreenElement == null) {
-			wcpWrapper = $(this).parents(".wcp-wrapper")[0];
-			if (wcpWrapper.webkitRequestFullscreen) wcpWrapper.webkitRequestFullscreen();
-			else if (wcpWrapper.requestFullscreen) wcpWrapper.requestFullscreen();
-			
-			if ($(this).parents(".wcp-wrapper").find(".wcp-maximize").length > 0) {
-				switchClass($(this).parents(".wcp-wrapper").find(".wcp-maximize")[0],"wcp-maximize","wcp-minimize");
-			}
-		} else {
-			if (window.document.webkitCancelFullScreen) window.document.webkitCancelFullScreen();
-			else if (window.document.cancelFullScreen) window.document.cancelFullScreen();
-
-			if ($(this).parents(".wcp-wrapper").find(".wcp-maximize") > 0) {
-				switchClass($(this).parents(".wcp-wrapper").find(".wcp-minimize"),"wcp-minimize","wcp-maximize");
-			}
-			if (vlcs["#"+$(this).parents(".wcp-wrapper")[0].id].multiscreen) {
-				$(this).parents(".wcp-wrapper").find(".wcp-toolbar").hide(0);
-				$(this).parents(".wcp-wrapper").find(".wcp-tooltip").hide(0);
-				$(this).parents(".wcp-wrapper").css({cursor: 'pointer'});
-				if (!wjs("#"+$(this).parents(".wcp-wrapper")[0].id).vlc.mute) {
-					wjs("#"+$(this).parents(".wcp-wrapper")[0].id).vlc.mute = true;
+		if (wjs("#"+$(this).parents(".wcp-wrapper")[0].id).opts.allowFullscreen) {
+			$(this).parents(".wcp-wrapper").find(".wcp-anim-basic").finish();
+			$(this).parents(".wcp-wrapper").find(".wcp-pause-anim").finish();
+			if (window.document.webkitFullscreenElement == null) {
+				wcpWrapper = $(this).parents(".wcp-wrapper")[0];
+				if (wcpWrapper.webkitRequestFullscreen) wcpWrapper.webkitRequestFullscreen();
+				else if (wcpWrapper.requestFullscreen) wcpWrapper.requestFullscreen();
+				
+				if ($(this).parents(".wcp-wrapper").find(".wcp-maximize").length > 0) {
+					switchClass($(this).parents(".wcp-wrapper").find(".wcp-maximize")[0],"wcp-maximize","wcp-minimize");
+				}
+			} else {
+				if (window.document.webkitCancelFullScreen) window.document.webkitCancelFullScreen();
+				else if (window.document.cancelFullScreen) window.document.cancelFullScreen();
+	
+				if ($(this).parents(".wcp-wrapper").find(".wcp-minimize").length > 0) {
+					switchClass($(this).parents(".wcp-wrapper").find(".wcp-minimize")[0],"wcp-minimize","wcp-maximize");
+				}
+				if (vlcs["#"+$(this).parents(".wcp-wrapper")[0].id].multiscreen) {
+					$(this).parents(".wcp-wrapper").find(".wcp-toolbar").hide(0);
+					$(this).parents(".wcp-wrapper").find(".wcp-tooltip").hide(0);
+					$(this).parents(".wcp-wrapper").css({cursor: 'pointer'});
+					if (!wjs("#"+$(this).parents(".wcp-wrapper")[0].id).vlc.mute) {
+						wjs("#"+$(this).parents(".wcp-wrapper")[0].id).vlc.mute = true;
+					}
 				}
 			}
 		}
@@ -439,6 +452,18 @@ wjs.prototype.addPlayer = function(wcpSettings) {
 	vlcs[newid].timestampUI = 0;
 	vlcs[newid].renderer = require("wcjs-renderer");
 	
+	// set default network-caching to 10 seconds
+	if (!wcpSettings["buffer"]) wcpSettings["buffer"] = 10000;
+	
+	if (!wcpSettings["vlcArgs"]) wcpSettings["vlcArgs"] = ["--network-caching="+wcpSettings["buffer"]];
+	else {
+		var checkBuffer = wcpSettings["vlcArgs"].some(function(el,ij) {
+			if (el.indexOf("--network-caching") == 0) return true;
+		});
+		if (!checkBuffer) wcpSettings["vlcArgs"].push("--network-caching="+wcpSettings["buffer"]);
+	}
+
+	
 	if (wcpSettings && wcpSettings["vlcArgs"]) vlcs[newid].vlc = vlcs[newid].renderer.init(wjs(newid).canvas,wcpSettings["vlcArgs"]);
 	else vlcs[newid].vlc = vlcs[newid].renderer.init(wjs(newid).canvas);
 	
@@ -484,6 +509,9 @@ wjs.prototype.addPlayer = function(wcpSettings) {
 			hasEnded(wjs(i));
 		}
 	}(newid);
+	
+	// set playlist mode to single playback, the player has it's own playlist mode feature
+	vlcs[newid].vlc.playlist.mode = vlcs[newid].vlc.playlist.Single;
 
 	return new wjs(newid);
 };
@@ -535,6 +563,15 @@ wjs.prototype.addPlaylist = function(playlist) {
 				  this.vlc.playlist.addWithOptions(playlist[item].url,playlist[item].vlcArgs);
 			  } else this.vlc.playlist.add(playlist[item].url);
 		  }
+	 }
+	 if (this.state() == "idle") {
+		if (this.opts.autoplay || this.opts.autostart) {
+			this.playItem(0);
+		}
+		if (this.opts.mute && this.vlc.mute === false) {
+			$(this.canvas).parents(".wcp-wrapper").find(".wcp-vol-button").removeClass("wcp-volume-medium").addClass("wcp-mute");
+			this.vlc.mute = true;
+		}
 	 }
 	// needs to refresh Playlist Menu items in the future
 
@@ -947,10 +984,12 @@ function timePassed(wjsPlayer,t) {
 	$(wjsPlayer.canvas).parent().find(".wcp-time-current").text(parseTime(t,wjsPlayer.vlc.length));
 }
 function positionChanged(wjsPlayer,position) {
+	this.opts.lastPos = position;
 	if (!seekDrag) $(wjsPlayer.canvas).parent().find(".wcp-progress-seen")[0].style.width = (position*100)+"%";
 };
 
 function isOpening(wjsPlayer) {
+	if (wjsPlayer.vlc.playlist.currentItem != wjsPlayer.opts.lastItem) wjsPlayer.opts.lastItem = wjsPlayer.vlc.playlist.currentItem;
 	var style = window.getComputedStyle($(wjsPlayer.allElements[0]).find(".wcp-status")[0]);
 	if (style.display === 'none') $(wjsPlayer.allElements[0]).find(".wcp-status").show();
 	$(wjsPlayer.allElements[0]).find(".wcp-status").text("Opening");
@@ -971,6 +1010,49 @@ function isPlaying(wjsPlayer) {
 
 function hasEnded(wjsPlayer) {
 	switchClass($(wjsPlayer.allElements[0]).find(".wcp-pause")[0],"wcp-pause","wcp-replay");
+	if (wjsPlayer.vlc.time > 0) {
+		if (wjsPlayer.opts.lastPos < 0.95) {
+			// Reconnect if connection to server lost
+			wjsPlayer.vlc.playlist.currentItem = wjsPlayer.opts.lastItem;
+			wjsPlayer.vlc.playlist.play();
+			wjsPlayer.vlc.position = wjsPlayer.opts.lastPos;
+
+			wjs_button = $(this.canvas).parents(".wcp-wrapper").find(".wcp-play");
+			if (wjs_button.length != 0) wjs_button.removeClass("wcp-play").addClass("wcp-pause");
+			
+			wjs_button = $(this.canvas).parents(".wcp-wrapper").find(".wcp-replay");
+			if (wjs_button.length != 0) wjs_button.removeClass("wcp-replay").addClass("wcp-pause");
+
+			positionChanged(wjsPlayer,0);
+			$(wjsPlayer.canvas).parents(".wcp-wrapper").find(".wcp-time-current").text("00:00");
+			// End Reconnect if connection to server lost
+		} else {
+			if (wjsPlayer.opts.loop && wjsPlayer.vlc.playlist.currentItem +1 == wjsPlayer.vlc.playlist.itemCount) {
+				wjsPlayer.vlc.playlist.playItem(0);
+				
+				wjs_button = $(this.canvas).parents(".wcp-wrapper").find(".wcp-play");
+				if (wjs_button.length != 0) wjs_button.removeClass("wcp-play").addClass("wcp-pause");
+				
+				wjs_button = $(this.canvas).parents(".wcp-wrapper").find(".wcp-replay");
+				if (wjs_button.length != 0) wjs_button.removeClass("wcp-replay").addClass("wcp-pause");
+				
+				positionChanged(wjsPlayer,0);
+				$(wjsPlayer.canvas).parents(".wcp-wrapper").find(".wcp-time-current").text("00:00");
+
+			} else if (wjsPlayer.vlc.playlist.currentItem +1 < wjsPlayer.vlc.playlist.itemCount) {
+				wjsPlayer.vlc.playlist.next();
+
+				wjs_button = $(this.canvas).parents(".wcp-wrapper").find(".wcp-play");
+				if (wjs_button.length != 0) wjs_button.removeClass("wcp-play").addClass("wcp-pause");
+				
+				wjs_button = $(this.canvas).parents(".wcp-wrapper").find(".wcp-replay");
+				if (wjs_button.length != 0) wjs_button.removeClass("wcp-replay").addClass("wcp-pause");
+				
+				positionChanged(wjsPlayer,0);
+				$(wjsPlayer.canvas).parents(".wcp-wrapper").find(".wcp-time-current").text("00:00");
+			}
+		}
+	}
 };
 // end player event handlers
 
