@@ -328,6 +328,7 @@ wjs.prototype.addPlayer = function(wcpSettings) {
 				else if (wcpWrapper.requestFullscreen) wcpWrapper.requestFullscreen();
 				$(wcpWrapper).css({cursor: 'default'});
 				if (wjs("#"+$(this).parents(".wcp-wrapper")[0].id).vlc.mute) {
+					$(this).parents(".wcp-wrapper").find(".wcp-vol-button").removeClass("wcp-mute").addClass("wcp-volume-medium");
 					wjs("#"+$(this).parents(".wcp-wrapper")[0].id).vlc.mute = false;
 				}
 				switchClass($(this).parent().find(".wcp-maximize")[0],"wcp-maximize","wcp-minimize");
@@ -568,7 +569,7 @@ wjs.prototype.addPlaylist = function(playlist) {
 		if (this.opts.autoplay || this.opts.autostart) {
 			this.playItem(0);
 		}
-		if (this.opts.mute && this.vlc.mute === false) {
+		if ((this.opts.mute || this.opts.multiscreen) && this.vlc.mute === false) {
 			$(this.canvas).parents(".wcp-wrapper").find(".wcp-vol-button").removeClass("wcp-volume-medium").addClass("wcp-mute");
 			this.vlc.mute = true;
 		}
