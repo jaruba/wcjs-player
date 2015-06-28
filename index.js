@@ -1190,7 +1190,13 @@ function positionChanged(wjsPlayer,position) {
 };
 
 function isOpening(wjsPlayer) {
-	if (wjsPlayer.vlc.playlist.currentItem != wjsPlayer.opts.lastItem) wjsPlayer.opts.lastItem = wjsPlayer.vlc.playlist.currentItem;
+	if (wjsPlayer.vlc.playlist.currentItem != wjsPlayer.opts.lastItem) {
+		opts[wjsPlayer.context].lastItem = wjsPlayer.vlc.playlist.currentItem;
+		wjsPlayer.opts.lastItem = wjsPlayer.vlc.playlist.currentItem;
+		if ($(wjsPlayer.canvas).parents(".wcp-wrapper").find(".wcp-playlist").is(":visible")) {
+			printPlaylist(wjsPlayer);
+		}
+	}
 	var style = window.getComputedStyle($(wjsPlayer.allElements[0]).find(".wcp-status")[0]);
 	if (style.display === 'none') $(wjsPlayer.allElements[0]).find(".wcp-status").show();
 	$(wjsPlayer.allElements[0]).find(".wcp-status").text("Opening");
