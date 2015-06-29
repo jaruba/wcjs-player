@@ -812,6 +812,12 @@ wjs.prototype.audioChan = function(newChan) {
 	return this;
 }
 
+wjs.prototype.audioChanInt = function(newChan) {
+	if (typeof newChan === 'number') this.vlc.audio.channel = newChan;
+	else return this.vlc.audio.channel;
+	return this;
+}
+
 wjs.prototype.mute = function(newMute) {
 	if (typeof newMute === "boolean") {
 		if (this.vlc.mute !== newMute) {
