@@ -3,7 +3,7 @@
 	src: url('../fonts/glyphicons.ttf');
 }
 @font-face {
-		font-family: 'OpenSans';
+	font-family: 'OpenSans';
 	src: url('../fonts/opensans.ttf');
 }
 @font-face {
@@ -141,17 +141,8 @@
 	bottom: 0;
 	left: 0;
 	z-index: 4;
-}
-
-.wcp-toolbar-background {
-	width: 100%;
-	height: 30px;
-	background: #000;
-	opacity: 0.9;
-	position: absolute;
-	bottom: 0;
-	left: 0;
-	z-index: -1;
+	background: rgba(0,0,0,0.9);
+	display: none
 }
 
 /* progress bar */

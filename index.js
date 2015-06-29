@@ -209,7 +209,7 @@ wjs.prototype.addPlayer = function(wcpSettings) {
 	opts[newid].lastItem = -1;
 	if (typeof opts[newid].allowFullscreen === 'undefined') opts[newid].allowFullscreen = true;
 
-	playerbody = '<div' + targetid + ' style="height: 100%"><canvas class="wcp-canvas wcp-center"></canvas><div class="wcp-surface"></div><div class="wcp-menu wcp-playlist wcp-center"><div class="wcp-menu-close"></div><div class="wcp-menu-title">Playlist Menu</div><div class="wcp-menu-items wcp-playlist-items"></div></div><div class="wcp-menu wcp-subtitles wcp-center"><div class="wcp-menu-close"></div><div class="wcp-menu-title">Subtitle Menu</div><div class="wcp-menu-items wcp-subtitles-items"></div></div><div class="wcp-pause-anim wcp-center"><i class="wcp-anim-basic wcp-anim-icon-play"></i></div><div class="wcp-titlebar"><span class="wcp-title"></span></div><div class="wcp-toolbar"><div class="wcp-toolbar-background"></div><div class="wcp-progress-bar"><div class="wcp-progress-seen"></div><div class="wcp-progress-pointer"></div></div><div class="wcp-button wcp-left wcp-prev" style="display: none"></div><div class="wcp-button wcp-left wcp-pause"></div><div class="wcp-button wcp-left wcp-next" style="display: none"></div><div class="wcp-button wcp-left wcp-vol-button wcp-volume-medium"></div><div class="wcp-vol-control"><div class="wcp-vol-bar"><div class="wcp-vol-bar-full"></div><div class="wcp-vol-bar-pointer"></div></div></div><div class="wcp-time"><span class="wcp-time-current">00:00</span> / <span class="wcp-time-total">00:00</span></div><div class="wcp-button wcp-right wcp-maximize"';
+	playerbody = '<div' + targetid + ' style="height: 100%"><canvas class="wcp-canvas wcp-center"></canvas><div class="wcp-surface"></div><div class="wcp-menu wcp-playlist wcp-center"><div class="wcp-menu-close"></div><div class="wcp-menu-title">Playlist Menu</div><div class="wcp-menu-items wcp-playlist-items"></div></div><div class="wcp-menu wcp-subtitles wcp-center"><div class="wcp-menu-close"></div><div class="wcp-menu-title">Subtitle Menu</div><div class="wcp-menu-items wcp-subtitles-items"></div></div><div class="wcp-pause-anim wcp-center"><i class="wcp-anim-basic wcp-anim-icon-play"></i></div><div class="wcp-titlebar"><span class="wcp-title"></span></div><div class="wcp-toolbar"><div></div><div class="wcp-progress-bar"><div class="wcp-progress-seen"></div><div class="wcp-progress-pointer"></div></div><div class="wcp-button wcp-left wcp-prev" style="display: none"></div><div class="wcp-button wcp-left wcp-pause"></div><div class="wcp-button wcp-left wcp-next" style="display: none"></div><div class="wcp-button wcp-left wcp-vol-button wcp-volume-medium"></div><div class="wcp-vol-control"><div class="wcp-vol-bar"><div class="wcp-vol-bar-full"></div><div class="wcp-vol-bar-pointer"></div></div></div><div class="wcp-time"><span class="wcp-time-current">00:00</span> / <span class="wcp-time-total">00:00</span></div><div class="wcp-button wcp-right wcp-maximize"';
 	if (!opts[newid].allowFullscreen) playerbody += ' style="cursor: not-allowed; color: rgba(123,123,123,0.6);"';
 	playerbody += '></div><div class="wcp-button wcp-right wcp-playlist-but"></div><div class="wcp-button wcp-right wcp-subtitle-but"></div></div><div class="wcp-status"></div><div class="wcp-subtitle-text"></div><div class="wcp-tooltip"><div class="wcp-tooltip-arrow"></div><div class="wcp-tooltip-inner">00:00</div></div></div>';
 	
@@ -766,6 +766,43 @@ wjs.prototype.subTrack = function(newTrack) {
 	return this;
 };
 // end function to Get/Set Subtitle Track
+
+wjs.prototype.audioCount = function() {
+	return parseInt(this.vlc.audio.count);
+}
+wjs.prototype.audioTrack = function(newTrack) {
+	if (typeof newTrack === 'number') this.vlc.audio.track = newTrack;
+	else return this.vlc.audio.track;
+	return this;
+}
+wjs.prototype.audioDesc = function(getDesc) {
+	if (typeof getDesc === 'number') return this.vlc.audio[getDesc];
+	return this;
+}
+wjs.prototype.audioDelay = function(newDelay) {
+	if (typeof newDelay === 'number') this.vlc.audio.delay = newDelay;
+	else return this.vlc.audio.delay;
+	return this;
+}
+wjs.prototype.audioChan = function(newChan) {
+	if (typeof newChan === 'string') {
+		if (newChan == "error") this.vlc.audio.channel = -1;
+		else if (newChan == "stereo") this.vlc.audio.channel = 1;
+		else if (newChan == "reverseStereo") this.vlc.audio.channel = 2;
+		else if (newChan == "left") this.vlc.audio.channel = 3;
+		else if (newChan == "right") this.vlc.audio.channel = 4;
+		else if (newChan == "dolby") this.vlc.audio.channel = 5;
+		else return false;
+	} else {
+		if (this.vlc.audio.channel == -1) return "error";
+		else if (this.vlc.audio.channel == 1) return "stereo";
+		else if (this.vlc.audio.channel == 2) return "reverseStereo";
+		else if (this.vlc.audio.channel == 3) return "left";
+		else if (this.vlc.audio.channel == 4) return "right";
+		else if (this.vlc.audio.channel == 5) return "dolby";
+	}
+	return this;
+}
 
 wjs.prototype.mute = function(newMute) {
 	if (typeof newMute === "boolean") {
