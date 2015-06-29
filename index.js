@@ -818,6 +818,14 @@ wjs.prototype.audioChanInt = function(newChan) {
 	return this;
 }
 
+wjs.prototype.deinterlace = function(newMode) {
+	if (typeof newMode === 'string') {
+		if (newMode == 'disabled') this.vlc.video.deinterlace.disable();
+		else this.vlc.video.deinterlace.enable(newMode);
+	} else return false;
+	return this;
+}
+
 wjs.prototype.mute = function(newMute) {
 	if (typeof newMute === "boolean") {
 		if (this.vlc.mute !== newMute) {
