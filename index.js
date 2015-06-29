@@ -204,11 +204,12 @@ wjs.prototype.addPlayer = function(wcpSettings) {
 		opts[newid] = {};
 		vlcs[newid].multiscreen = false;
 	}
+	if (typeof opts[newid].titleBar === 'undefined') opts[newid].titleBar = "fullscreen";
 	opts[newid].subDelay = 0;
 	opts[newid].lastItem = -1;
 	if (typeof opts[newid].allowFullscreen === 'undefined') opts[newid].allowFullscreen = true;
 
-	playerbody = '<div' + targetid + ' style="height: 100%"><canvas class="wcp-canvas wcp-center"></canvas><div class="wcp-surface"></div><div class="wcp-menu wcp-playlist wcp-center"><div class="wcp-menu-close"></div><div class="wcp-menu-title">Playlist Menu</div><div class="wcp-menu-items wcp-playlist-items"></div></div><div class="wcp-menu wcp-subtitles wcp-center"><div class="wcp-menu-close"></div><div class="wcp-menu-title">Subtitle Menu</div><div class="wcp-menu-items wcp-subtitles-items"></div></div><div class="wcp-pause-anim wcp-center"><i class="wcp-anim-basic wcp-anim-icon-play"></i></div><div class="wcp-toolbar"><div class="wcp-toolbar-background"></div><div class="wcp-progress-bar"><div class="wcp-progress-seen"></div><div class="wcp-progress-pointer"></div></div><div class="wcp-button wcp-left wcp-prev" style="display: none"></div><div class="wcp-button wcp-left wcp-pause"></div><div class="wcp-button wcp-left wcp-next" style="display: none"></div><div class="wcp-button wcp-left wcp-vol-button wcp-volume-medium"></div><div class="wcp-vol-control"><div class="wcp-vol-bar"><div class="wcp-vol-bar-full"></div><div class="wcp-vol-bar-pointer"></div></div></div><div class="wcp-time"><span class="wcp-time-current">00:00</span> / <span class="wcp-time-total">00:00</span></div><div class="wcp-button wcp-right wcp-maximize"';
+	playerbody = '<div' + targetid + ' style="height: 100%"><canvas class="wcp-canvas wcp-center"></canvas><div class="wcp-surface"></div><div class="wcp-menu wcp-playlist wcp-center"><div class="wcp-menu-close"></div><div class="wcp-menu-title">Playlist Menu</div><div class="wcp-menu-items wcp-playlist-items"></div></div><div class="wcp-menu wcp-subtitles wcp-center"><div class="wcp-menu-close"></div><div class="wcp-menu-title">Subtitle Menu</div><div class="wcp-menu-items wcp-subtitles-items"></div></div><div class="wcp-pause-anim wcp-center"><i class="wcp-anim-basic wcp-anim-icon-play"></i></div><div class="wcp-titlebar"><span class="wcp-title"></span></div><div class="wcp-toolbar"><div class="wcp-toolbar-background"></div><div class="wcp-progress-bar"><div class="wcp-progress-seen"></div><div class="wcp-progress-pointer"></div></div><div class="wcp-button wcp-left wcp-prev" style="display: none"></div><div class="wcp-button wcp-left wcp-pause"></div><div class="wcp-button wcp-left wcp-next" style="display: none"></div><div class="wcp-button wcp-left wcp-vol-button wcp-volume-medium"></div><div class="wcp-vol-control"><div class="wcp-vol-bar"><div class="wcp-vol-bar-full"></div><div class="wcp-vol-bar-pointer"></div></div></div><div class="wcp-time"><span class="wcp-time-current">00:00</span> / <span class="wcp-time-total">00:00</span></div><div class="wcp-button wcp-right wcp-maximize"';
 	if (!opts[newid].allowFullscreen) playerbody += ' style="cursor: not-allowed; color: rgba(123,123,123,0.6);"';
 	playerbody += '></div><div class="wcp-button wcp-right wcp-playlist-but"></div><div class="wcp-button wcp-right wcp-subtitle-but"></div></div><div class="wcp-status"></div><div class="wcp-subtitle-text"></div><div class="wcp-tooltip"><div class="wcp-tooltip-arrow"></div><div class="wcp-tooltip-inner">00:00</div></div></div>';
 	
@@ -336,6 +337,10 @@ wjs.prototype.addPlayer = function(wcpSettings) {
 			}
 		}
 		if (buttonClass == "wcp-minimize") {
+			if (opts["#"+$(this).parents(".wcp-wrapper")[0].id].titleBar == "none" || opts["#"+$(this).parents(".wcp-wrapper")[0].id].titleBar == "fullscreen") {
+				$(this).parents(".wcp-wrapper").find(".wcp-titlebar").hide(0);
+				if ($(this).parents(".wcp-wrapper").find(".wcp-status").css("top") == "35px") $(this).parents(".wcp-wrapper").find(".wcp-status").css("top", "10px");
+			}
 			if (window.document.webkitCancelFullScreen) window.document.webkitCancelFullScreen();
 			else if (window.document.cancelFullScreen) window.document.cancelFullScreen();
 			switchClass(this,"wcp-minimize","wcp-maximize");
@@ -349,6 +354,10 @@ wjs.prototype.addPlayer = function(wcpSettings) {
 			}
 		} else if (buttonClass == "wcp-maximize") {
 			if (wjs("#"+$(this).parents(".wcp-wrapper")[0].id).opts.allowFullscreen) {
+				if (opts["#"+$(this).parents(".wcp-wrapper")[0].id].titleBar == "none" || opts["#"+$(this).parents(".wcp-wrapper")[0].id].titleBar == "minimized") {
+					$(this).parents(".wcp-wrapper").find(".wcp-titlebar").hide(0);
+					if ($(this).parents(".wcp-wrapper").find(".wcp-status").css("top") == "35px") $(this).parents(".wcp-wrapper").find(".wcp-status").css("top", "10px");
+				}
 				wcpWrapper = $(this).parents(".wcp-wrapper")[0];
 				if (wcpWrapper.webkitRequestFullscreen) wcpWrapper.webkitRequestFullscreen();
 				else if (wcpWrapper.requestFullscreen) wcpWrapper.requestFullscreen();
@@ -405,6 +414,10 @@ wjs.prototype.addPlayer = function(wcpSettings) {
 			$(this).parents(".wcp-wrapper").find(".wcp-anim-basic").finish();
 			$(this).parents(".wcp-wrapper").find(".wcp-pause-anim").finish();
 			if (window.document.webkitFullscreenElement == null) {
+				if (opts["#"+$(this).parents(".wcp-wrapper")[0].id].titleBar == "none" || opts["#"+$(this).parents(".wcp-wrapper")[0].id].titleBar == "minimized") {
+					$(this).parents(".wcp-wrapper").find(".wcp-titlebar").hide(0);
+					if ($(this).parents(".wcp-wrapper").find(".wcp-status").css("top") == "35px") $(this).parents(".wcp-wrapper").find(".wcp-status").css("top", "10px");
+				}
 				wcpWrapper = $(this).parents(".wcp-wrapper")[0];
 				if (wcpWrapper.webkitRequestFullscreen) wcpWrapper.webkitRequestFullscreen();
 				else if (wcpWrapper.requestFullscreen) wcpWrapper.requestFullscreen();
@@ -413,6 +426,13 @@ wjs.prototype.addPlayer = function(wcpSettings) {
 					switchClass($(this).parents(".wcp-wrapper").find(".wcp-maximize")[0],"wcp-maximize","wcp-minimize");
 				}
 			} else {
+				
+				if (opts["#"+$(this).parents(".wcp-wrapper")[0].id].titleBar == "none" || opts["#"+$(this).parents(".wcp-wrapper")[0].id].titleBar == "fullscreen") {
+					$(this).parents(".wcp-wrapper").find(".wcp-titlebar").hide(0);
+					if ($(this).parents(".wcp-wrapper").find(".wcp-status").css("top") == "35px") $(this).parents(".wcp-wrapper").find(".wcp-status").css("top", "10px");
+				}
+
+				
 				if (window.document.webkitCancelFullScreen) window.document.webkitCancelFullScreen();
 				else if (window.document.cancelFullScreen) window.document.cancelFullScreen();
 	
@@ -438,6 +458,18 @@ wjs.prototype.addPlayer = function(wcpSettings) {
 			clearTimeout(vlcs["#"+$(this).find(".wcp-wrapper")[0].id].hideUI);
 			$(this).css({cursor: 'default'});
 			
+			if (window.document.webkitFullscreenElement == null) {
+				if (opts["#"+$(this).find(".wcp-wrapper")[0].id].titleBar == "both" || opts["#"+$(this).find(".wcp-wrapper")[0].id].titleBar == "minimized") {
+					$(this).find(".wcp-titlebar").stop().show(0);
+					if ($(this).find(".wcp-status").css("top") == "10px") $(this).find(".wcp-status").css("top", "35px");
+				}
+			} else {
+				if (opts["#"+$(this).find(".wcp-wrapper")[0].id].titleBar == "both" || opts["#"+$(this).find(".wcp-wrapper")[0].id].titleBar == "fullscreen") {
+					$(this).find(".wcp-titlebar").stop().show(0);
+					if ($(this).find(".wcp-status").css("top") == "10px") $(this).find(".wcp-status").css("top", "35px");
+				}
+			}
+
 			$(this).find(".wcp-toolbar").stop().show(0);
 			if (!volDrag && !seekDrag) {
 				if ($($(this).find(".wcp-toolbar").selector + ":hover").length > 0) {
@@ -1196,6 +1228,7 @@ function isOpening(wjsPlayer) {
 		if ($(wjsPlayer.canvas).parents(".wcp-wrapper").find(".wcp-playlist").is(":visible")) {
 			printPlaylist(wjsPlayer);
 		}
+		$(wjsPlayer.canvas).parent().find(".wcp-title")[0].innerHTML = wjsPlayer.vlc.playlist.items[wjsPlayer.vlc.playlist.currentItem].title.replace("[custom]","");
 	}
 	var style = window.getComputedStyle($(wjsPlayer.allElements[0]).find(".wcp-status")[0]);
 	if (style.display === 'none') $(wjsPlayer.allElements[0]).find(".wcp-status").show();
@@ -1224,6 +1257,9 @@ function isBuffering(wjsPlayer,percent) {
 
 function isPlaying(wjsPlayer) {
 	if (wjsPlayer.opts.firstTime) {
+		if ($(wjsPlayer.canvas).parent().find(".wcp-title").text() != wjsPlayer.vlc.playlist.items[wjsPlayer.vlc.playlist.currentItem].title.replace("[custom]","")) {
+			$(wjsPlayer.canvas).parent().find(".wcp-title")[0].innerHTML = wjsPlayer.vlc.playlist.items[wjsPlayer.vlc.playlist.currentItem].title.replace("[custom]","");
+		}
 		wjsPlayer.opts.firstTime = false;
 		if (wjsPlayer.vlc.subtitles.track > 0) wjsPlayer.vlc.subtitles.track = 0;
 		wjsPlayer.opts.currentSub = 0;
@@ -1389,11 +1425,20 @@ function parseTime(t,total) {
 }
 
 function wcp_hideUI(wjsWrapper) {
-	if (vlcs["#"+wjsWrapper.find(".wcp-wrapper")[0].id].multiscreen && window.document.webkitFullscreenElement == null) {
-	} else {
+	if (!(vlcs["#"+wjsWrapper.find(".wcp-wrapper")[0].id].multiscreen && window.document.webkitFullscreenElement == null)) {
 		if (seekDrag || volDrag || ($(wjsWrapper.find(".wcp-toolbar").selector + ":hover").length > 0 && vlcs["#"+wjsWrapper.find(".wcp-wrapper")[0].id].timestampUI + 20 > Math.floor(Date.now() / 1000))) {
 			vlcs["#"+wjsWrapper.find(".wcp-wrapper")[0].id].hideUI = setTimeout(function(i) { return function() { wcp_hideUI(i); } }(wjsWrapper),3000);
 			return;
+		}
+		if (window.document.webkitFullscreenElement == null) {
+			if (opts["#"+wjsWrapper.find(".wcp-wrapper")[0].id].titleBar == "both" || opts["#"+wjsWrapper.find(".wcp-wrapper")[0].id].titleBar == "minimized") {
+				wjsWrapper.find(".wcp-titlebar").stop().fadeOut();
+				
+			}
+		} else {
+			if (opts["#"+wjsWrapper.find(".wcp-wrapper")[0].id].titleBar == "both" || opts["#"+wjsWrapper.find(".wcp-wrapper")[0].id].titleBar == "fullscreen") {
+				wjsWrapper.find(".wcp-titlebar").stop().fadeOut();
+			}
 		}
 		wjsWrapper.find(".wcp-toolbar").stop().fadeOut();
 		wjsWrapper.find(".wcp-tooltip").stop().fadeOut();

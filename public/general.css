@@ -13,6 +13,82 @@
 
 .wcp-canvas { z-index: 1 }
 
+.wcp-menu {
+	font-family: 'Helvetica', 'Arial';
+	font-size: 13px;
+	letter-spacing: 1;
+	z-index: 4;
+	width: 682px;
+	height: 261px;
+	max-width: 90%;
+	max-height: 80%;
+	background-color: #292929;
+	color: #c0c0c0;
+	padding: 6px;
+	display: none
+}
+
+.wcp-menu-title {
+	height: 26px;
+	line-height: 26px;
+	background-color: #1c1c1c;
+	padding-left: 12px;
+	width: calc(100% - 56px);
+	overflow-y: hidden;
+}
+
+.wcp-menu-items {
+	margin-top: 6px;
+	height: calc(100% - 32px);
+	width: 100%;
+	overflow-y: scroll;
+	overflow-x: hidden;
+}
+
+.wcp-menu-item {
+	width: calc(100% - 14px);
+	height: 40px;
+	line-height: 40px;
+	padding-left: 14px;
+	overflow: hidden;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+}
+
+.wcp-menu-selected {
+	background-color: #e5e5e5;
+	color: #131313;
+}
+
+.wcp-menu-item:hover {
+	background-color: #3d3d3d;
+	cursor: pointer;
+	color: #c0c0c0;
+}
+
+.wcp-menu-close {
+	height: 26px;
+	line-height: 26px;
+	width: 35px;
+	font-family: 'Glyphs';
+	background-color: #1c1c1c;
+	float: right;
+	text-align: center;
+}
+
+.wcp-menu-close:hover {
+	background-color: #151515;
+	color: #eaeaea;
+	cursor: pointer
+}
+
+.wcp-menu-close:before {
+	content: "\E896";
+	font-size: 12px;
+	margin-left: 1px;
+}
+
+
 .wcp-center {
 	position: absolute;
 	top: 50%;
@@ -36,6 +112,26 @@
     top: 0;
     left: 0;
 	z-index: 3;
+}
+
+.wcp-titlebar {
+	width: calc(100% - 16px);
+	height: 20px;
+	line-height: 20px;
+    position: absolute;
+	padding: 4px 8px;
+    top: 0;
+    left: 0;
+	z-index: 4;
+	background: rgba(0,0,0,0.8);
+	display: none;
+}
+
+.wcp-title {
+	font-size: 16px;
+	font-family: 'SourceSans';
+	letter-spacing: 1;
+	color: #828282;
 }
 
 .wcp-toolbar {
@@ -96,6 +192,7 @@
 	line-height: 30px;
 	font-size: 18px;
 	color: #7b7b7b;
+	vertical-align: top;
 }
 
 .wcp-button:hover {
@@ -139,6 +236,7 @@
 	position: relative;
 	top: 11px;
 	cursor: pointer;
+	vertical-align: top;
 }
 
 .wcp-vol-bar-full {
@@ -171,17 +269,25 @@
 }
 
 /*  Playback Button Icons */
-.wcp-prev:before { content: "\E80A" }
+.wcp-prev:before { content: "\E80A"; font-size: 11px }
 .wcp-play:before { content: "\E87F" }
 .wcp-pause:before { content: "\E880" }
 .wcp-replay:before { content: "\E8A7" }
-.wcp-next:before { content: "\E809" }
+.wcp-next:before { content: "\E809"; font-size: 11px }
 
 /*  Audio Related Button Icons */
 .wcp-mute:before { content: "\E877" }
 .wcp-volume-low:before { content: "\E876" }
 .wcp-volume-medium:before { content: "\E875" }
 .wcp-volume-high:before { content: "\E878" }
+
+/* Playlist Button */
+.wcp-playlist-but { display: none }
+.wcp-playlist-but:before { content: "\E833"; font-size: 26px }
+
+/* Subtitle Button */
+/* .wcp-subtitle-but { display: none } */
+.wcp-subtitle-but:before { content: "\E83A"; font-size: 23px }
 
 /* Fullscreen Button Icons */
 .wcp-minimize:before { content: "\E805"; font-size: 24px }
@@ -210,6 +316,20 @@
 	font-family: "OpenSans";
 	position: absolute;
 	top: 10px;
+	left: 0;
+	width: 100%;
+	font-size: 20px;
+	z-index: 2;
+	color: #fff;
+	text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
+	text-align: center
+}
+
+/* Subtitle Text */
+.wcp-subtitle-text {
+	font-family: "OpenSans";
+	position: absolute;
+	bottom: 40px;
 	left: 0;
 	width: 100%;
 	font-size: 20px;
