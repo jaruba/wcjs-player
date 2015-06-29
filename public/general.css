@@ -1,14 +1,14 @@
 @font-face {
-  font-family: 'Glyphs';
-  src: url('../fonts/glyphicons.ttf');
+	font-family: 'Glyphs';
+	src: url('../fonts/glyphicons.ttf');
 }
 @font-face {
-  font-family: 'OpenSans';
-  src: url('../fonts/opensans.ttf');
+		font-family: 'OpenSans';
+	src: url('../fonts/opensans.ttf');
 }
 @font-face {
-  font-family: 'SourceSans';
-  src: url('../fonts/sourcesanspro.ttf');
+	font-family: 'SourceSans';
+	src: url('../fonts/sourcesanspro.ttf');
 }
 
 .wcp-canvas { z-index: 1 }
@@ -268,14 +268,14 @@
 	top: -2px
 }
 
-/*  Playback Button Icons */
+/* Playback Button Icons */
 .wcp-prev:before { content: "\E80A"; font-size: 11px }
 .wcp-play:before { content: "\E87F" }
 .wcp-pause:before { content: "\E880" }
 .wcp-replay:before { content: "\E8A7" }
 .wcp-next:before { content: "\E809"; font-size: 11px }
 
-/*  Audio Related Button Icons */
+/* Audio Related Button Icons */
 .wcp-mute:before { content: "\E877" }
 .wcp-volume-low:before { content: "\E876" }
 .wcp-volume-medium:before { content: "\E875" }
@@ -340,40 +340,40 @@
 }
 
 .wcp-tooltip {
-  position: absolute;
-  z-index: 1070;
-  display: block;
-  font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
-  font-size: 12px;
-  font-weight: 400;
-  line-height: 1.4;
-  filter: alpha(opacity=0);
-  bottom: 44px;
-  display: none;
+	position: absolute;
+	z-index: 1070;
+	display: block;
+	font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+	font-size: 12px;
+	font-weight: 400;
+	line-height: 1.4;
+	filter: alpha(opacity=0);
+	bottom: 44px;
+	display: none;
 }
 
 .wcp-tooltip-arrow {
-  bottom: 0;
-  left: 50%;
-  margin-left: -7px;
-  border-width: 5px 5px 0;
-  position: absolute;
-  border-color: transparent;
-  border-style: solid;
-  bottom: -6px;
-  width: 0;
-  height: 0;
-  border-left: 6px solid transparent;
-  border-right: 6px solid transparent;
-  border-top: 6px solid #000;
+	bottom: 0;
+	left: 50%;
+	margin-left: -7px;
+	border-width: 5px 5px 0;
+	position: absolute;
+	border-color: transparent;
+	border-style: solid;
+	bottom: -6px;
+	width: 0;
+	height: 0;
+	border-left: 6px solid transparent;
+	border-right: 6px solid transparent;
+	border-top: 6px solid #000;
 }
 
 .wcp-tooltip-inner {
-  max-width: 200px;
-  padding: 3px 8px;
-  color: #fff;
-  text-align: center;
-  text-decoration: none;
-  background-color: #000;
-  border-radius: 2px;
+	max-width: 200px;
+	padding: 3px 8px;
+	color: #fff;
+	text-align: center;
+	text-decoration: none;
+	background-color: #000;
+	border-radius: 2px;
 }
