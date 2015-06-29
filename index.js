@@ -24,7 +24,8 @@ var vlcs = {},
 	seekDrag = false,
 	volDrag = false,
 	firstTime = true,
-	http = require('http');
+	http = require('http'),
+	events = require('events');
 
 if (!$("link[href='"+__dirname.replace("\\","/")+"/public/general.css']").length) {
 	// inject stylesheet
@@ -196,6 +197,8 @@ wjs.prototype.addPlayer = function(wcpSettings) {
 	} else { var targetid = ' id="webchimera" class="wcp-wrapper"'; newid = "#webchimera"; }
 	
 	vlcs[newid] = {};
+	
+	vlcs[newid].events = new events.EventEmitter();
 
 	if (wcpSettings) {
 		opts[newid] = wcpSettings;
@@ -569,27 +572,87 @@ wjs.prototype.addPlayer = function(wcpSettings) {
 		}
 	}(newid);
 	
+	vlcs[newid].vlc.onNothingSpecial = function(i) {
+		return function() {
+			if (vlcs[wjs(i).context].lastState != "idle") {
+				vlcs[wjs(i).context].lastState = "idle";
+				vlcs[wjs(i).context].events.emit('StateChanged','idle');
+				vlcs[wjs(i).context].events.emit('StateChangedInt',0);
+			}
+		}
+	}(newid);
+	
 	vlcs[newid].vlc.onOpening = function(i) {
 		return function() {
+			if (vlcs[wjs(i).context].lastState != "opening") {
+				vlcs[wjs(i).context].lastState = "opening";
+				vlcs[wjs(i).context].events.emit('StateChanged','opening');
+				vlcs[wjs(i).context].events.emit('StateChangedInt',1);
+			}
 			isOpening(wjs(i));
 		}
 	}(newid);
 
 	vlcs[newid].vlc.onBuffering = function(i) {
 		return function(event) {
+			if (vlcs[wjs(i).context].lastState != "buffering") {
+				vlcs[wjs(i).context].lastState = "buffering";
+				vlcs[wjs(i).context].events.emit('StateChanged','buffering');
+				vlcs[wjs(i).context].events.emit('StateChangedInt',2);
+			}
 			isBuffering(wjs(i),event);
 		}
 	}(newid);
 
 	vlcs[newid].vlc.onPlaying = function(i) {
 		return function() {
+			if (vlcs[wjs(i).context].lastState != "playing") {
+				vlcs[wjs(i).context].lastState = "playing";
+				vlcs[wjs(i).context].events.emit('StateChanged','playing');
+				vlcs[wjs(i).context].events.emit('StateChangedInt',3);
+			}
 			isPlaying(wjs(i));
 		}
 	}(newid);
 
+	vlcs[newid].vlc.onPaused = function(i) {
+		return function() {
+			if (vlcs[wjs(i).context].lastState != "paused") {
+				vlcs[wjs(i).context].lastState = "paused";
+				vlcs[wjs(i).context].events.emit('StateChanged','paused');
+				vlcs[wjs(i).context].events.emit('StateChangedInt',4);
+			}
+		}
+	}(newid);
+	
+	vlcs[newid].vlc.onStopped = function(i) {
+		return function() {
+			if (vlcs[wjs(i).context].lastState != "stopping") {
+				vlcs[wjs(i).context].lastState = "stopping";
+				vlcs[wjs(i).context].events.emit('StateChanged','stopping');
+				vlcs[wjs(i).context].events.emit('StateChangedInt',5);
+			}
+		}
+	}(newid);
+	
 	vlcs[newid].vlc.onEndReached = function(i) {
 		return function() {
+			if (vlcs[wjs(i).context].lastState != "ended") {
+				vlcs[wjs(i).context].lastState = "ended";
+				vlcs[wjs(i).context].events.emit('StateChanged','ended');
+				vlcs[wjs(i).context].events.emit('StateChangedInt',6);
+			}
 			hasEnded(wjs(i));
+		}
+	}(newid);
+	
+	vlcs[newid].vlc.onEncounteredError = function(i) {
+		return function() {
+			if (vlcs[wjs(i).context].lastState != "error") {
+				vlcs[wjs(i).context].lastState = "error";
+				vlcs[wjs(i).context].events.emit('StateChanged','error');
+				vlcs[wjs(i).context].events.emit('StateChangedInt',7);
+			}
 		}
 	}(newid);
 	
@@ -1228,6 +1291,8 @@ wjs.prototype.onBackward = function(wjs_function) { this.catchEvent("Backward",w
 wjs.prototype.onError = function(wjs_function) { this.catchEvent("EncounteredError",wjs_function); return this; }
 wjs.prototype.onEnded = function(wjs_function) { this.catchEvent("EndReached",wjs_function); return this; }
 wjs.prototype.onStopped = function(wjs_function) { this.catchEvent("Stopped",wjs_function); return this; }
+wjs.prototype.onState = function(wjs_function) { vlcs[this.context].events.on('StateChanged',wjs_function); return this; }
+wjs.prototype.onStateInt = function(wjs_function) { vlcs[this.context].events.on('StateChangedInt',wjs_function); return this; }
 wjs.prototype.onTime = function(wjs_function) { this.catchEvent("TimeChanged",wjs_function); return this; }
 wjs.prototype.onPosition = function(wjs_function) { this.catchEvent("PositionChanged",wjs_function); return this; }
 // end event proxies
