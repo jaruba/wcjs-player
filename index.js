@@ -860,6 +860,16 @@ wjs.prototype.itemCount = function() {
 	return parseInt(this.vlc.playlist.itemCount);
 }
 
+wjs.prototype.itemDesc = function(getDesc) {
+	if (typeof getDesc === 'number') {
+		if (getDesc > -1 && getDesc < this.vlc.playlist.itemCount) {
+			wjsDesc = JSON.stringify(this.vlc.playlist.items[getDesc]);
+			return JSON.parse(wjsDesc.replace('"title":"[custom]','"title":"').split('\\"').join('"').split('"{').join('{').split('}"').join('}'));
+		} else return false;
+	}
+	return false;
+}
+
 wjs.prototype.playing = function() {
 	return this.vlc.playing;
 }
