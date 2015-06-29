@@ -767,6 +767,14 @@ wjs.prototype.subTrack = function(newTrack) {
 };
 // end function to Get/Set Subtitle Track
 
+wjs.prototype.subDelay = function(newDelay) {
+	if (typeof newDelay === 'number') {
+		this.vlc.subtitles.delay = newDelay;
+		opts[this.context].subDelay = newDelay;
+	} else return opts[this.context].subDelay;
+	return this;
+}
+
 wjs.prototype.audioCount = function() {
 	return parseInt(this.vlc.audio.count);
 }
@@ -1306,6 +1314,8 @@ function isPlaying(wjsPlayer) {
 		
 		if (itemSetting.subtitles) totalSubs += Object.keys(itemSetting.subtitles).length;
 		
+		opts[wjsPlayer.context].subDelay = 0;
+		
 		if (totalSubs > 0) $(wjsPlayer.canvas).parents(".wcp-wrapper").find(".wcp-subtitle-but").show(0);
 		
 	}
@@ -1601,6 +1611,7 @@ function printSubtitles(wjsPlayer) {
 			}
 		}
 		opts["#"+wrapperId].currentSub = parseInt(this.getAttribute('data-item'));
+		opts["#"+wrapperId].subDelay = 0;
 		printSubtitles(wjs("#"+wrapperId));
 	});
 	
