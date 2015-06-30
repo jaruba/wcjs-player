@@ -935,6 +935,12 @@ wjs.prototype.position = function(newPosition) {
 	return this;
 }
 
+wjs.prototype.rate = function(newRate) {
+	if (typeof newRate === 'number') this.vlc.input.rate = newRate;
+	else return this.vlc.input.rate;
+	return this;
+}
+
 wjs.prototype.currentItem = function(newItem) {
 	if (typeof newItem === 'number') {
 		if (this.vlc.playlist.currentItem == newItem)
