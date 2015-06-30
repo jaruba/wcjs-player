@@ -210,6 +210,7 @@ wjs.prototype.addPlayer = function(wcpSettings) {
 	if (typeof opts[newid].titleBar === 'undefined') opts[newid].titleBar = "fullscreen";
 	opts[newid].subDelay = 0;
 	opts[newid].lastItem = -1;
+	opts[newid].aspectRatio = "Default";
 	if (typeof opts[newid].allowFullscreen === 'undefined') opts[newid].allowFullscreen = true;
 
 	playerbody = '<div' + targetid + ' style="height: 100%"><canvas class="wcp-canvas wcp-center"></canvas><div class="wcp-surface"></div><div class="wcp-menu wcp-playlist wcp-center"><div class="wcp-menu-close"></div><div class="wcp-menu-title">Playlist Menu</div><div class="wcp-menu-items wcp-playlist-items"></div></div><div class="wcp-menu wcp-subtitles wcp-center"><div class="wcp-menu-close"></div><div class="wcp-menu-title">Subtitle Menu</div><div class="wcp-menu-items wcp-subtitles-items"></div></div><div class="wcp-pause-anim wcp-center"><i class="wcp-anim-basic wcp-anim-icon-play"></i></div><div class="wcp-titlebar"><span class="wcp-title"></span></div><div class="wcp-toolbar"><div></div><div class="wcp-progress-bar"><div class="wcp-progress-seen"></div><div class="wcp-progress-pointer"></div></div><div class="wcp-button wcp-left wcp-prev" style="display: none"></div><div class="wcp-button wcp-left wcp-pause"></div><div class="wcp-button wcp-left wcp-next" style="display: none"></div><div class="wcp-button wcp-left wcp-vol-button wcp-volume-medium"></div><div class="wcp-vol-control"><div class="wcp-vol-bar"><div class="wcp-vol-bar-full"></div><div class="wcp-vol-bar-pointer"></div></div></div><div class="wcp-time"><span class="wcp-time-current">00:00</span> / <span class="wcp-time-total">00:00</span></div><div class="wcp-button wcp-right wcp-maximize"';
@@ -711,6 +712,7 @@ wjs.prototype.addPlaylist = function(playlist) {
 			  if (playlist[item].title) this.vlc.playlist.items[this.vlc.playlist.itemCount-1].title = "[custom]"+playlist[item].title;
 			  this.vlc.playlist.items[this.vlc.playlist.itemCount-1].setting = "{}";
 			  var playerSettings = {};
+			  if (typeof playlist[item].aspectRatio !== 'undefined') playerSettings.aspectRatio = playlist[item].aspectRatio;
 			  if (typeof playlist[item].subtitles !== 'undefined') playerSettings.subtitles = playlist[item].subtitles;
 			  if (Object.keys(playerSettings).length > 0) this.vlc.playlist.items[this.vlc.playlist.itemCount-1].setting = JSON.stringify(playerSettings);
 		  }
@@ -724,7 +726,7 @@ wjs.prototype.addPlaylist = function(playlist) {
 			this.vlc.mute = true;
 		}
 	 }
-	// needs to refresh Playlist Menu items in the future
+	
 	if ($(this.canvas).parents(".wcp-wrapper").find(".wcp-playlist").is(":visible")) printPlaylist(this);
 	
 	// show playlist button if multiple playlist items
@@ -980,10 +982,17 @@ wjs.prototype.height = function() {
 	return this.canvas.height;
 }
 
+wjs.prototype.aspectRatio = function(newRatio) {
+	if (typeof newRatio === 'string') {
+		opts[this.context].aspectRatio = newRatio;
+		autoResize();
+	} else return opts[this.context].aspectRatio;
+	return this;
+}
+
 wjs.prototype.advanceItem = function(newX,newY) {
 	if (typeof newX === 'number' && typeof newY === 'number') {
 		this.vlc.playlist.advanceItem(newX,newY);
-		// needs to refresh Playlist Menu items in the future
 		if ($(this.canvas).parents(".wcp-wrapper").find(".wcp-playlist").is(":visible")) printPlaylist(this);
 	} else return false;
 	return this;
@@ -997,7 +1006,6 @@ wjs.prototype.removeItem = function(remItem) {
 				 $(this.canvas).parent().find(".wcp-next").hide(0);
 			 }
 		 } else this.vlc.playlist.removeItem(remItem);
-		// needs to refresh Playlist Menu items in the future
 		if ($(this.canvas).parents(".wcp-wrapper").find(".wcp-playlist").is(":visible")) printPlaylist(this);
 		// hide playlist button if less then 2 playlist items
 		if (this.vlc.playlist.itemCount < 2) {
@@ -1011,7 +1019,6 @@ wjs.prototype.clearPlaylist = function() {
 	this.stop();
 	this.vlc.playlist.clear();
 	$(this.canvas).parent().find(".wcp-time-total").text("00:00");
-	// needs to refresh Playlist Menu items in the future
 	if ($(this.canvas).parents(".wcp-wrapper").find(".wcp-playlist").is(":visible")) printPlaylist(this);
 	if ($(this.canvas).parents(".wcp-wrapper").find(".wcp-playlist-but").is(":visible")) {
 		$(this.canvas).parents(".wcp-wrapper").find(".wcp-playlist-but").hide(0);
@@ -1401,6 +1408,14 @@ function isPlaying(wjsPlayer) {
 		totalSubs = wjsPlayer.vlc.subtitles.count;
 		itemSetting = JSON.parse(wjsPlayer.vlc.playlist.items[wjsPlayer.vlc.playlist.currentItem].setting);
 		
+		// set default aspect ratio
+		if (itemSetting.aspectRatio) {
+			opts[wjsPlayer.context].aspectRatio = itemSetting.aspectRatio;
+		} else {
+			opts[wjsPlayer.context].aspectRatio = "Default";
+			autoResize();
+		}
+
 		if (itemSetting.subtitles) totalSubs += Object.keys(itemSetting.subtitles).length;
 		
 		opts[wjsPlayer.context].subDelay = 0;
@@ -1466,18 +1481,32 @@ function singleResize(wjsPlayer,width,height) {
 	wjsPlayer.canvas.width = width;
 	wjsPlayer.canvas.height = height;
 
-	// resize video layer
 	var container = $(wjsPlayer.context);
-	var sourceAspect = wjsPlayer.canvas.width / wjsPlayer.canvas.height;
-	var destAspect = container.width() / container.height();
-	var cond = destAspect > sourceAspect;
-
-	if (cond) {
-		wjsPlayer.canvas.style.height = "100%";
-		wjsPlayer.canvas.style.width = ( (container.height() * sourceAspect) / container.width() ) * 100 + "%";
+	if (opts[wjsPlayer.context].aspectRatio != "Default" && opts[wjsPlayer.context].aspectRatio.indexOf(":") > -1) {
+		// aspect ratio logic
+		var res = opts[wjsPlayer.context].aspectRatio.split(":");
+		var destAspect = container.width() / container.height();
+		var ratio = gcd(wjsPlayer.canvas.width,wjsPlayer.canvas.height);
+		var sourceAspect = (ratio * parseFloat(res[0])) / (ratio * parseFloat(res[1]));
+		var cond = destAspect > sourceAspect;
+		if (cond) {
+			wjsPlayer.canvas.style.height = "100%";
+			wjsPlayer.canvas.style.width = ( (container.height() * sourceAspect) / container.width() ) * 100 + "%";
+		} else {
+			wjsPlayer.canvas.style.height = ( (container.width() / sourceAspect) / container.height() ) * 100 + "%";
+			wjsPlayer.canvas.style.width = "100%";
+		}
 	} else {
-		wjsPlayer.canvas.style.height = ( (container.width() / sourceAspect) / container.height() ) * 100 + "%";
-		wjsPlayer.canvas.style.width = "100%";
+		var destAspect = container.width() / container.height();
+		var sourceAspect = wjsPlayer.canvas.width / wjsPlayer.canvas.height;
+		var cond = destAspect > sourceAspect;
+		if (cond) {
+			wjsPlayer.canvas.style.height = "100%";
+			wjsPlayer.canvas.style.width = ( (container.height() * sourceAspect) / container.width() ) * 100 + "%";
+		} else {
+			wjsPlayer.canvas.style.height = ( (container.width() / sourceAspect) / container.height() ) * 100 + "%";
+			wjsPlayer.canvas.style.width = "100%";
+		}
 	}
 	
 }
@@ -1497,17 +1526,33 @@ function autoResize() {
 			
 			// resize video layer
 			var container = $(wjsPlayer.context);
-			var sourceAspect = wjsPlayer.canvas.width / wjsPlayer.canvas.height;
-			var destAspect = container.width() / container.height();
-			var cond = destAspect > sourceAspect;
-		
-			if (cond) {
-				wjsPlayer.canvas.style.height = "100%";
-				wjsPlayer.canvas.style.width = ( (container.height() * sourceAspect) / container.width() ) * 100 + "%";
+			if (opts["#"+$(obj).find(".wcp-wrapper")[0].id].aspectRatio != "Default" && opts["#"+$(obj).find(".wcp-wrapper")[0].id].aspectRatio.indexOf(":") > -1) {
+				// aspect ratio logic
+				var res = opts["#"+$(obj).find(".wcp-wrapper")[0].id].aspectRatio.split(":");
+				var destAspect = container.width() / container.height();
+				var ratio = gcd(wjsPlayer.canvas.width,wjsPlayer.canvas.height);
+				var sourceAspect = (ratio * parseFloat(res[0])) / (ratio * parseFloat(res[1]));
+				var cond = destAspect > sourceAspect;
+				if (cond) {
+					wjsPlayer.canvas.style.height = "100%";
+					wjsPlayer.canvas.style.width = ( (container.height() * sourceAspect) / container.width() ) * 100 + "%";
+				} else {
+					wjsPlayer.canvas.style.height = ( (container.width() / sourceAspect) / container.height() ) * 100 + "%";
+					wjsPlayer.canvas.style.width = "100%";
+				}
 			} else {
-				wjsPlayer.canvas.style.height = ( (container.width() / sourceAspect) / container.height() ) * 100 + "%";
-				wjsPlayer.canvas.style.width = "100%";
+				var destAspect = container.width() / container.height();
+				var sourceAspect = wjsPlayer.canvas.width / wjsPlayer.canvas.height;
+				var cond = destAspect > sourceAspect;
+				if (cond) {
+					wjsPlayer.canvas.style.height = "100%";
+					wjsPlayer.canvas.style.width = ( (container.height() * sourceAspect) / container.width() ) * 100 + "%";
+				} else {
+					wjsPlayer.canvas.style.height = ( (container.width() / sourceAspect) / container.height() ) * 100 + "%";
+					wjsPlayer.canvas.style.width = "100%";
+				}
 			}
+		
 		}
 	});
 }
@@ -1837,5 +1882,7 @@ function nl2br(str,is_xhtml) {
     var breakTag = (is_xhtml || typeof is_xhtml === 'undefined') ? '<br />' : '<br>';
     return (str + '').replace(/([^>\r\n]?)(\r\n|\n\r|\r|\n)/g, '$1' + breakTag + '$2');
 }
+
+function gcd(a,b) {if(b>a) {temp = a; a = b; b = temp} while(b!=0) {m=a%b; a=b; b=m;} return a;}
 
 module.exports = wjs;
