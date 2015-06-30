@@ -965,6 +965,10 @@ wjs.prototype.length = function() {
 	return this.vlc.length;
 }
 
+wjs.prototype.fps = function() {
+	return this.vlc.input.fps;
+}
+
 wjs.prototype.state = function() {
 	reqState = this.vlc.state;
 	if (reqState == 0) return "idle";
