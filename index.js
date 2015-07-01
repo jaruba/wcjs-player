@@ -37,6 +37,23 @@ if (!$("link[href='"+__dirname.replace("\\","/")+"/public/general.css']").length
 	window.document.styleSheets[0].addRule('.wcp-menu-items::-webkit-scrollbar-thumb','background-color: #e5e5e5; border-right: 13px solid rgba(0, 0, 0, 0); border-left: 21px solid rgba(0, 0, 0, 0); background-clip: padding-box;');
 }
 
+// clear wcjs-player from require cache when page changes
+window.onbeforeunload = function(e) {
+	if (global.require.cache) {
+		for(module in global.require.cache) {
+			if(global.require.cache.hasOwnProperty(module) && module.indexOf("wcjs-player") > -1) {
+				delete global.require.cache[module];
+			}
+		}
+	} else if (require.cache) {
+		for(module in require.cache) {
+			if(require.cache.hasOwnProperty(module) && module.indexOf("wcjs-player") > -1) {
+				delete require.cache[module];
+			}
+		}
+	}
+}
+
 function wjs(context) {
 	
 	this.version = "v0.3.5";
