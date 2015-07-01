@@ -1729,6 +1729,10 @@ function wcp_showPlaylist(wjsPlayer) {
 		}
 		printPlaylist(wjsPlayer);
 		wjsPlayer.wrapper.find(".wcp-playlist").show(0);
+		playlistItems = wjsPlayer.wrapper.find(".wcp-playlist-items");
+		if (playlistItems.outerHeight() <= (oi* parseInt(playlistItems.find(".wcp-playlist-item").css("height")))) {
+			playlistItems.css("cursor","pointer");
+		} else playlistItems.css("cursor","default");
 	}
 }
 
@@ -1746,6 +1750,10 @@ function wcp_showSubtitles(wjsPlayer) {
 		}
 		printSubtitles(wjsPlayer);
 		wjsPlayer.wrapper.find(".wcp-subtitles").show(0);
+		playlistItems = wjsPlayer.wrapper.find(".wcp-subtitles-items");
+		if (playlistItems.outerHeight() <= (oi* parseInt(playlistItems.find(".wcp-subtitles-item").css("height")))) {
+			playlistItems.css("cursor","pointer");
+		} else playlistItems.css("cursor","default");
 	}
 }
 
@@ -1795,9 +1803,6 @@ function printPlaylist(wjsPlayer) {
 		playlistItems.css('overflowY', 'scroll');
 		playlistItems.html("");
 		playlistItems.html(generatePlaylist);
-		if (playlistItems.outerHeight() <= (oi* parseInt(playlistItems.find(".wcp-playlist-item").css("height")))) {
-			playlistItems.css("cursor","pointer");
-		} else playlistItems.css("cursor","default");
 		wjsPlayer.wrapper.find(".wcp-playlist-item").click(function() {
 			if (!$(this).hasClass("wcp-menu-selected")) {
 				wjs_button = $(wjs("#"+$(this).parents(".wcp-wrapper")[0].id).canvas).parents(".wcp-wrapper").find(".wcp-play");
@@ -1846,10 +1851,6 @@ function printSubtitles(wjsPlayer) {
 
 	playlistItems.html("");
 	playlistItems.html(generatePlaylist);
-	
-	if (playlistItems.outerHeight() <= (oi* parseInt(playlistItems.find(".wcp-subtitles-item").css("height")))) {
-		playlistItems.css("cursor","pointer");
-	} else playlistItems.css("cursor","default");
 	
 	wjsPlayer.wrapper.find(".wcp-subtitles-item").click(function() {
 		wrapperId = $(this).parents(".wcp-wrapper")[0].id;
