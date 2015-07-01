@@ -229,6 +229,7 @@ wjs.prototype.addPlayer = function(wcpSettings) {
 		vlcs[newid].multiscreen = false;
 	}
 	if (typeof opts[newid].titleBar === 'undefined') opts[newid].titleBar = "fullscreen";
+	opts[newid].uiHidden = false;
 	opts[newid].subDelay = 0;
 	opts[newid].lastItem = -1;
 	opts[newid].aspectRatio = "Default";
@@ -283,26 +284,12 @@ wjs.prototype.addPlayer = function(wcpSettings) {
 		vlc = wjsPlayer.vlc;
 		buttonClass = this.className.replace("wcp-button","").replace("wcp-left","").replace("wcp-vol-button","").replace("wcp-right","").split(" ").join("");
 		if (buttonClass == "wcp-playlist-but") {
-			if ($(this).parents(".wcp-wrapper").find(".wcp-playlist").is(":visible")) {
-				$(this).parents(".wcp-wrapper").find(".wcp-playlist").hide(0);
-			} else {
-				if ($(this).parents(".wcp-wrapper").find(".wcp-subtitles").is(":visible")) {
-					$(this).parents(".wcp-wrapper").find(".wcp-subtitles").hide(0);
-				}
-				printPlaylist(wjs("#"+$(this).parents(".wcp-wrapper")[0].id));
-				$(this).parents(".wcp-wrapper").find(".wcp-playlist").show(0);
-			}
+			if ($(this).parents(".wcp-wrapper").find(".wcp-playlist").is(":visible")) wcp_hidePlaylist(wjsPlayer);
+			else wcp_showPlaylist(wjsPlayer);
 		}
 		if (buttonClass == "wcp-subtitle-but") {
-			if ($(this).parents(".wcp-wrapper").find(".wcp-subtitles").is(":visible")) {
-				$(this).parents(".wcp-wrapper").find(".wcp-subtitles").hide(0);
-			} else {
-				if ($(this).parents(".wcp-wrapper").find(".wcp-playlist").is(":visible")) {
-					$(this).parents(".wcp-wrapper").find(".wcp-playlist").hide(0);
-				}
-				printSubtitles(wjs("#"+$(this).parents(".wcp-wrapper")[0].id));
-				$(this).parents(".wcp-wrapper").find(".wcp-subtitles").show(0);
-			}
+			if ($(this).parents(".wcp-wrapper").find(".wcp-subtitles").is(":visible")) wcp_hideSubtitles(wjsPlayer);
+			else wcp_showSubtitles(wjsPlayer);
 		}
 		if ([3,4,6].indexOf(vlc.state) > -1) {
 			if (buttonClass == "wcp-play") {
@@ -368,32 +355,9 @@ wjs.prototype.addPlayer = function(wcpSettings) {
 			}
 		}
 		if (buttonClass == "wcp-minimize") {
-			if (opts["#"+$(this).parents(".wcp-wrapper")[0].id].titleBar == "none" || opts["#"+$(this).parents(".wcp-wrapper")[0].id].titleBar == "fullscreen") {
-				$(this).parents(".wcp-wrapper").find(".wcp-titlebar").hide(0);
-				if ($(this).parents(".wcp-wrapper").find(".wcp-status").css("top") == "35px") $(this).parents(".wcp-wrapper").find(".wcp-status").css("top", "10px");
-			}
-			if (window.document.webkitCancelFullScreen) window.document.webkitCancelFullScreen();
-			else if (window.document.cancelFullScreen) window.document.cancelFullScreen();
-			switchClass(this,"wcp-minimize","wcp-maximize");
-			if (vlcs["#"+$(this).parents(".wcp-wrapper")[0].id].multiscreen) {
-				$(this).parents(".wcp-wrapper").find(".wcp-toolbar").hide(0);
-				$(this).parents(".wcp-wrapper").find(".wcp-tooltip").hide(0);
-				$(this).parents(".wcp-wrapper").css({cursor: 'pointer'});
-				if (!wjs("#"+$(this).parents(".wcp-wrapper")[0].id).vlc.mute) {
-					wjs("#"+$(this).parents(".wcp-wrapper")[0].id).vlc.mute = true;
-				}
-			}
+			wcp_fullscreen_off(wjs("#"+$(this).parents(".wcp-wrapper")[0].id));
 		} else if (buttonClass == "wcp-maximize") {
-			if (wjs("#"+$(this).parents(".wcp-wrapper")[0].id).opts.allowFullscreen) {
-				if (opts["#"+$(this).parents(".wcp-wrapper")[0].id].titleBar == "none" || opts["#"+$(this).parents(".wcp-wrapper")[0].id].titleBar == "minimized") {
-					$(this).parents(".wcp-wrapper").find(".wcp-titlebar").hide(0);
-					if ($(this).parents(".wcp-wrapper").find(".wcp-status").css("top") == "35px") $(this).parents(".wcp-wrapper").find(".wcp-status").css("top", "10px");
-				}
-				wcpWrapper = $(this).parents(".wcp-wrapper")[0];
-				if (wcpWrapper.webkitRequestFullscreen) wcpWrapper.webkitRequestFullscreen();
-				else if (wcpWrapper.requestFullscreen) wcpWrapper.requestFullscreen();
-				switchClass(this,"wcp-maximize","wcp-minimize");
-			}
+			wcp_fullscreen_on(wjs("#"+$(this).parents(".wcp-wrapper")[0].id));
 		}
 	});
 	
@@ -444,69 +408,37 @@ wjs.prototype.addPlayer = function(wcpSettings) {
 		if (wjs("#"+$(this).parents(".wcp-wrapper")[0].id).opts.allowFullscreen) {
 			$(this).parents(".wcp-wrapper").find(".wcp-anim-basic").finish();
 			$(this).parents(".wcp-wrapper").find(".wcp-pause-anim").finish();
-			if (window.document.webkitFullscreenElement == null) {
-				if (opts["#"+$(this).parents(".wcp-wrapper")[0].id].titleBar == "none" || opts["#"+$(this).parents(".wcp-wrapper")[0].id].titleBar == "minimized") {
-					$(this).parents(".wcp-wrapper").find(".wcp-titlebar").hide(0);
-					if ($(this).parents(".wcp-wrapper").find(".wcp-status").css("top") == "35px") $(this).parents(".wcp-wrapper").find(".wcp-status").css("top", "10px");
-				}
-				wcpWrapper = $(this).parents(".wcp-wrapper")[0];
-				if (wcpWrapper.webkitRequestFullscreen) wcpWrapper.webkitRequestFullscreen();
-				else if (wcpWrapper.requestFullscreen) wcpWrapper.requestFullscreen();
-				
-				if ($(this).parents(".wcp-wrapper").find(".wcp-maximize").length > 0) {
-					switchClass($(this).parents(".wcp-wrapper").find(".wcp-maximize")[0],"wcp-maximize","wcp-minimize");
-				}
-			} else {
-				
-				if (opts["#"+$(this).parents(".wcp-wrapper")[0].id].titleBar == "none" || opts["#"+$(this).parents(".wcp-wrapper")[0].id].titleBar == "fullscreen") {
-					$(this).parents(".wcp-wrapper").find(".wcp-titlebar").hide(0);
-					if ($(this).parents(".wcp-wrapper").find(".wcp-status").css("top") == "35px") $(this).parents(".wcp-wrapper").find(".wcp-status").css("top", "10px");
-				}
-
-				
-				if (window.document.webkitCancelFullScreen) window.document.webkitCancelFullScreen();
-				else if (window.document.cancelFullScreen) window.document.cancelFullScreen();
-	
-				if ($(this).parents(".wcp-wrapper").find(".wcp-minimize").length > 0) {
-					switchClass($(this).parents(".wcp-wrapper").find(".wcp-minimize")[0],"wcp-minimize","wcp-maximize");
-				}
-				if (vlcs["#"+$(this).parents(".wcp-wrapper")[0].id].multiscreen) {
-					$(this).parents(".wcp-wrapper").find(".wcp-toolbar").hide(0);
-					$(this).parents(".wcp-wrapper").find(".wcp-tooltip").hide(0);
-					$(this).parents(".wcp-wrapper").css({cursor: 'pointer'});
-					if (!wjs("#"+$(this).parents(".wcp-wrapper")[0].id).vlc.mute) {
-						wjs("#"+$(this).parents(".wcp-wrapper")[0].id).vlc.mute = true;
-					}
-				}
-			}
+			wcp_toggleFullscreen(wjs("#"+$(this).parents(".wcp-wrapper")[0].id));
 		}
 	});
 	
 	wjs(newid).wrapper.parent().bind("mousemove",function(e) {
-		if (vlcs["#"+$(this).find(".wcp-wrapper")[0].id].multiscreen && window.document.webkitFullscreenElement == null) {
-			$(this).css({cursor: 'default'});
-		} else {
-			clearTimeout(vlcs["#"+$(this).find(".wcp-wrapper")[0].id].hideUI);
-			$(this).css({cursor: 'default'});
-			
-			if (window.document.webkitFullscreenElement == null) {
-				if (opts["#"+$(this).find(".wcp-wrapper")[0].id].titleBar == "both" || opts["#"+$(this).find(".wcp-wrapper")[0].id].titleBar == "minimized") {
-					$(this).find(".wcp-titlebar").stop().show(0);
-					if ($(this).find(".wcp-status").css("top") == "10px") $(this).find(".wcp-status").css("top", "35px");
-				}
+		if (opts["#"+$(this).find(".wcp-wrapper")[0].id].uiHidden === false) {
+			if (vlcs["#"+$(this).find(".wcp-wrapper")[0].id].multiscreen && window.document.webkitFullscreenElement == null) {
+				$(this).css({cursor: 'default'});
 			} else {
-				if (opts["#"+$(this).find(".wcp-wrapper")[0].id].titleBar == "both" || opts["#"+$(this).find(".wcp-wrapper")[0].id].titleBar == "fullscreen") {
-					$(this).find(".wcp-titlebar").stop().show(0);
-					if ($(this).find(".wcp-status").css("top") == "10px") $(this).find(".wcp-status").css("top", "35px");
+				clearTimeout(vlcs["#"+$(this).find(".wcp-wrapper")[0].id].hideUI);
+				$(this).css({cursor: 'default'});
+				
+				if (window.document.webkitFullscreenElement == null) {
+					if (opts["#"+$(this).find(".wcp-wrapper")[0].id].titleBar == "both" || opts["#"+$(this).find(".wcp-wrapper")[0].id].titleBar == "minimized") {
+						$(this).find(".wcp-titlebar").stop().show(0);
+						if ($(this).find(".wcp-status").css("top") == "10px") $(this).find(".wcp-status").css("top", "35px");
+					}
+				} else {
+					if (opts["#"+$(this).find(".wcp-wrapper")[0].id].titleBar == "both" || opts["#"+$(this).find(".wcp-wrapper")[0].id].titleBar == "fullscreen") {
+						$(this).find(".wcp-titlebar").stop().show(0);
+						if ($(this).find(".wcp-status").css("top") == "10px") $(this).find(".wcp-status").css("top", "35px");
+					}
 				}
-			}
-
-			$(this).find(".wcp-toolbar").stop().show(0);
-			if (!volDrag && !seekDrag) {
-				if ($($(this).find(".wcp-toolbar").selector + ":hover").length > 0) {
-					vlcs["#"+$(this).find(".wcp-wrapper")[0].id].hideUI = setTimeout(function(i) { return function() { wcp_hideUI($(i).parent()); } }($(this)),3000);
-					vlcs["#"+$(this).find(".wcp-wrapper")[0].id].timestampUI = Math.floor(Date.now() / 1000);
-				} else vlcs["#"+$(this).find(".wcp-wrapper")[0].id].hideUI = setTimeout(function(i) { return function() { wcp_hideUI(i); } }($(this)),3000);
+	
+				$(this).find(".wcp-toolbar").stop().show(0);
+				if (!volDrag && !seekDrag) {
+					if ($($(this).find(".wcp-toolbar").selector + ":hover").length > 0) {
+						vlcs["#"+$(this).find(".wcp-wrapper")[0].id].hideUI = setTimeout(function(i) { return function() { wcp_hideUI($(i).parent()); } }($(this)),3000);
+						vlcs["#"+$(this).find(".wcp-wrapper")[0].id].timestampUI = Math.floor(Date.now() / 1000);
+					} else vlcs["#"+$(this).find(".wcp-wrapper")[0].id].hideUI = setTimeout(function(i) { return function() { wcp_hideUI(i); } }($(this)),3000);
+				}
 			}
 		}
 	});
@@ -766,13 +698,6 @@ wjs.prototype.addPlaylist = function(playlist) {
 	return this;
 };
 // end function to add playlist items
-
-// function to Clear External Subtitle
-wjs.prototype.clearSubtitle = function() {
-	clearSubtitles(this);
-	return this;
-};
-// end function to Clear External Subtitle
 
 // function to Get Subtitle Description
 wjs.prototype.subDesc = function(getDesc) {
@@ -1367,11 +1292,125 @@ wjs.prototype.catchEvent = function(wjs_event,wjs_function) {
 };
 // end catch event function
 
+wjs.prototype.videoOut = function(newBool) {
+	if (typeof newBool !== 'undefined') {
+		if (newBool === true) {
+			if (opts[this.context].zoom == 0) {
+				opts[this.context].zoom = opts[this.context].lastZoom;
+				delete opts[this.context].lastZoom;
+				autoResize();
+				return true;
+			} else return false;
+		} else {
+			if (opts[this.context].zoom > 0) {
+				opts[this.context].lastZoom = opts[this.context].zoom;
+				opts[this.context].zoom = 0;
+				autoResize();
+				return true;
+			} else return false;
+		}
+	}
+};
+
+wjs.prototype.playlist = function(newBool) {
+	if (typeof newBool !== 'undefined') {
+		if (newBool === true) return wcp_showPlaylist(this);
+		else return wcp_hidePlaylist(this);
+	} else return this.wrapper.find(".wcp-playlist")[0];
+};
+
+wjs.prototype.subtitles = function(newBool) {
+	if (typeof newBool !== 'undefined') {
+		if (newBool === true) return wcp_showSubtitles(this);
+		else return wcp_hideSubtitles(this);
+	} else return this.wrapper.find(".wcp-subtitles")[0];
+};
+
+wjs.prototype.ui = function(newBool) {
+	if (typeof newBool !== 'undefined') {
+		if (newBool === true) {
+			if (opts[this.context].uiHidden) {
+				opts[this.context].uiHidden = false;
+				this.wrapper.find(".wcp-titlebar").stop().show(0);
+				this.wrapper.find(".wcp-toolbar").stop().show(0);
+				this.wrapper.css({cursor: 'default'});
+				return true;
+			} else return false;
+		} else {
+			if (!opts[this.context].uiHidden) {
+				opts[this.context].uiHidden = true;
+				this.wrapper.find(".wcp-titlebar").stop().hide(0);
+				this.wrapper.find(".wcp-toolbar").stop().hide(0);
+				this.wrapper.find(".wcp-tooltip").stop().hide(0);
+				this.wrapper.css({cursor: 'default'});
+				return true;
+			} else return false;
+		}
+	} else return this;
+};
+
+wjs.prototype.toggleFullscreen = function() {
+	return wcp_toggleFullscreen(this);
+}
+
+wjs.prototype.fullscreen = function(newBool) {
+	if (typeof newBool !== 'undefined') {
+		if (newBool === true) return wcp_fullscreen_on(this);
+		else return wcp_fullscreen_off(this);
+	} else return this;
+};
+
 // html element selector
 function sel(context) {
 	return $($(this).parents(".wcp-wrapper")[0]).find(context);
 }
 
+function wcp_toggleFullscreen(wjsPlayer) {
+	if (window.document.webkitFullscreenElement == null) return wcp_fullscreen_on(wjsPlayer);
+	else return wcp_fullscreen_off(wjsPlayer);
+}
+
+function wcp_fullscreen_on(wjsPlayer) {
+	if (window.document.webkitFullscreenElement == null) {
+		if (opts[wjsPlayer.context].titleBar == "none" || opts[wjsPlayer.context].titleBar == "minimized") {
+			wjsPlayer.wrapper.find(".wcp-titlebar").hide(0);
+			if (wjsPlayer.wrapper.find(".wcp-status").css("top") == "35px") wjsPlayer.wrapper.find(".wcp-status").css("top", "10px");
+		}
+		wcpWrapper = wjsPlayer.wrapper[0];
+		if (wcpWrapper.webkitRequestFullscreen) wcpWrapper.webkitRequestFullscreen();
+		else if (wcpWrapper.requestFullscreen) wcpWrapper.requestFullscreen();
+		
+		if (wjsPlayer.wrapper.find(".wcp-maximize").length > 0) {
+			switchClass(wjsPlayer.wrapper.find(".wcp-maximize")[0],"wcp-maximize","wcp-minimize");
+		}
+		return true;
+	} else return false;
+}
+
+function wcp_fullscreen_off(wjsPlayer) {
+	if (window.document.webkitFullscreenElement != null) {
+		if (opts[wjsPlayer.context].titleBar == "none" || opts[wjsPlayer.context].titleBar == "fullscreen") {
+			wjsPlayer.wrapper.find(".wcp-titlebar").hide(0);
+			if (wjsPlayer.wrapper.find(".wcp-status").css("top") == "35px") wjsPlayer.wrapper.find(".wcp-status").css("top", "10px");
+		}
+
+		
+		if (window.document.webkitCancelFullScreen) window.document.webkitCancelFullScreen();
+		else if (window.document.cancelFullScreen) window.document.cancelFullScreen();
+
+		if (wjsPlayer.wrapper.find(".wcp-minimize").length > 0) {
+			switchClass(wjsPlayer.wrapper.find(".wcp-minimize")[0],"wcp-minimize","wcp-maximize");
+		}
+		if (vlcs[wjsPlayer.context].multiscreen) {
+			wjsPlayer.wrapper.find(".wcp-titlebar").hide(0);
+			wjsPlayer.wrapper.find(".wcp-toolbar").hide(0);
+			wjsPlayer.wrapper.find(".wcp-tooltip").hide(0);
+			wjsPlayer.wrapper.css({cursor: 'pointer'});
+			if (!wjsPlayer.vlc.mute) wjsPlayer.vlc.mute = true;
+		}
+		return true;
+	} else return false;
+}
 
 // player event handlers
 function timePassed(wjsPlayer,t) {
@@ -1688,6 +1727,39 @@ function wcp_hideUI(wjsWrapper) {
 		wjsWrapper.find(".wcp-toolbar").stop().fadeOut();
 		wjsWrapper.find(".wcp-tooltip").stop().fadeOut();
 		wjsWrapper.css({cursor: 'none'});
+	}
+}
+
+function wcp_showPlaylist(wjsPlayer) {
+	if (!wjsPlayer.wrapper.find(".wcp-playlist").is(":visible")) {
+		if (wjsPlayer.wrapper.find(".wcp-subtitles").is(":visible")) {
+			wjsPlayer.wrapper.find(".wcp-subtitles").hide(0);
+		}
+		printPlaylist(wjsPlayer);
+		wjsPlayer.wrapper.find(".wcp-playlist").show(0);
+	}
+}
+
+function wcp_hidePlaylist(wjsPlayer) {
+	if (wjsPlayer.wrapper.find(".wcp-playlist").is(":visible")) {
+		wjsPlayer.wrapper.find(".wcp-playlist").hide(0);
+	}
+}
+
+
+function wcp_showSubtitles(wjsPlayer) {
+	if (!wjsPlayer.wrapper.find(".wcp-subtitles").is(":visible")) {
+		if (wjsPlayer.wrapper.find(".wcp-playlist").is(":visible")) {
+			wjsPlayer.wrapper.find(".wcp-playlist").hide(0);
+		}
+		printSubtitles(wjsPlayer);
+		wjsPlayer.wrapper.find(".wcp-subtitles").show(0);
+	}
+}
+
+function wcp_hideSubtitles(wjsPlayer) {
+	if (wjsPlayer.wrapper.find(".wcp-subtitles").is(":visible")) {
+		wjsPlayer.wrapper.find(".wcp-subtitles").hide(0);
 	}
 }
 
