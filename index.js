@@ -307,27 +307,31 @@ wjs.prototype.addPlayer = function(wcpSettings) {
 				$(this).parents(".wcp-wrapper").find(".wcp-progress-seen").css("width","0%");
 				$(this).parents(".wcp-wrapper").find(".wcp-time-current").text("00:00");
 			} else if (buttonClass == "wcp-prev") {
-				wjs_button = $(this).parents(".wcp-wrapper").find(".wcp-play");
-				if (wjs_button.length != 0) wjs_button.removeClass("wcp-play").addClass("wcp-pause");
-			
-				wjs_button = $(this).parents(".wcp-wrapper").find(".wcp-replay");
-				if (wjs_button.length != 0) wjs_button.removeClass("wcp-replay").addClass("wcp-pause");
-			
-				vlc.playlist.prev();
+				if (vlc.playlist.currentItem > 0) {
+					wjs_button = $(this).parents(".wcp-wrapper").find(".wcp-play");
+					if (wjs_button.length != 0) wjs_button.removeClass("wcp-play").addClass("wcp-pause");
 				
-				positionChanged(wjsPlayer,0);
-				$(this).parents(".wcp-wrapper").find(".wcp-time-current").text("00:00");
+					wjs_button = $(this).parents(".wcp-wrapper").find(".wcp-replay");
+					if (wjs_button.length != 0) wjs_button.removeClass("wcp-replay").addClass("wcp-pause");
+				
+					vlc.playlist.prev();
+					
+					positionChanged(wjsPlayer,0);
+					$(this).parents(".wcp-wrapper").find(".wcp-time-current").text("00:00");
+				}
 			} else if (buttonClass == "wcp-next") {
-				wjs_button = $(this).parents(".wcp-wrapper").find(".wcp-play");
-				if (wjs_button.length != 0) wjs_button.removeClass("wcp-play").addClass("wcp-pause");
-			
-				wjs_button = $(this).parents(".wcp-wrapper").find(".wcp-replay");
-				if (wjs_button.length != 0) wjs_button.removeClass("wcp-replay").addClass("wcp-pause");
-			
-				vlc.playlist.next();
+				if (vlc.playlist.currentItem +1 < vlc.playlist.itemCount) {
+					wjs_button = $(this).parents(".wcp-wrapper").find(".wcp-play");
+					if (wjs_button.length != 0) wjs_button.removeClass("wcp-play").addClass("wcp-pause");
 				
-				positionChanged(wjsPlayer,0);
-				$(this).parents(".wcp-wrapper").find(".wcp-time-current").text("00:00");
+					wjs_button = $(this).parents(".wcp-wrapper").find(".wcp-replay");
+					if (wjs_button.length != 0) wjs_button.removeClass("wcp-replay").addClass("wcp-pause");
+				
+					vlc.playlist.next();
+					
+					positionChanged(wjsPlayer,0);
+					$(this).parents(".wcp-wrapper").find(".wcp-time-current").text("00:00");
+				}
 			} else if (["wcp-volume-low","wcp-volume-medium","wcp-volume-high"].indexOf(buttonClass) > -1) {
 				switchClass(this,buttonClass,"wcp-mute");
 				vlc.toggleMute();
@@ -1714,17 +1718,19 @@ function printPlaylist(wjsPlayer) {
 			playlistItems.css("cursor","pointer");
 		} else playlistItems.css("cursor","default");
 		wjsPlayer.wrapper.find(".wcp-playlist-item").click(function() {
-			wjs_button = $(wjs("#"+$(this).parents(".wcp-wrapper")[0].id).canvas).parents(".wcp-wrapper").find(".wcp-play");
-			if (wjs_button.length != 0) wjs_button.removeClass("wcp-play").addClass("wcp-pause");
-			
-			wjs_button = $(wjs("#"+$(this).parents(".wcp-wrapper")[0].id).canvas).parents(".wcp-wrapper").find(".wcp-replay");
-			if (wjs_button.length != 0) wjs_button.removeClass("wcp-replay").addClass("wcp-pause");
-			
-			positionChanged(wjs("#"+$(this).parents(".wcp-wrapper")[0].id),0);
-			$(wjs("#"+$(this).parents(".wcp-wrapper")[0].id).canvas).parents(".wcp-wrapper").find(".wcp-time-current").text("00:00");
-			
-			vlcs["#"+$(this).parents(".wcp-wrapper")[0].id].vlc.playlist.playItem(parseInt(this.getAttribute('data-item')));
-			printPlaylist(wjs("#"+$(this).parents(".wcp-wrapper")[0].id));
+			if (!$(this).hasClass("wcp-menu-selected")) {
+				wjs_button = $(wjs("#"+$(this).parents(".wcp-wrapper")[0].id).canvas).parents(".wcp-wrapper").find(".wcp-play");
+				if (wjs_button.length != 0) wjs_button.removeClass("wcp-play").addClass("wcp-pause");
+				
+				wjs_button = $(wjs("#"+$(this).parents(".wcp-wrapper")[0].id).canvas).parents(".wcp-wrapper").find(".wcp-replay");
+				if (wjs_button.length != 0) wjs_button.removeClass("wcp-replay").addClass("wcp-pause");
+				
+				positionChanged(wjs("#"+$(this).parents(".wcp-wrapper")[0].id),0);
+				$(wjs("#"+$(this).parents(".wcp-wrapper")[0].id).canvas).parents(".wcp-wrapper").find(".wcp-time-current").text("00:00");
+				
+				vlcs["#"+$(this).parents(".wcp-wrapper")[0].id].vlc.playlist.playItem(parseInt(this.getAttribute('data-item')));
+				printPlaylist(wjs("#"+$(this).parents(".wcp-wrapper")[0].id));
+			}
 		});
 		
 	} else playlistItems.html("");
