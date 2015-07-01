@@ -63,8 +63,6 @@ function wjs(context) {
 	
 	if (hasClass($(this.context)[0],"webchimeras")) this.context = "#"+$(this.context).find(".wcp-wrapper")[0].id;
 	
-	this.video = { }; // Video Object (holds width, height, pixelFormat)
-
 	if (this.context.substring(0,1) == "#") {
 		if (window.document.getElementById(this.context.substring(1)).firstChild) {
 			this.wrapper = window.document.getElementById(this.context.substring(1));
@@ -82,12 +80,6 @@ function wjs(context) {
 	if (vlcs[this.context]) {
 		this.vlc = vlcs[this.context].vlc;
 		this.renderer = vlcs[this.context].renderer;
-		if (vlcs[this.context].width) {
-			this.video = {};
-			this.video.width = vlcs[this.context].width;
-			this.video.height = vlcs[this.context].height;
-			this.video.pixelFormat = vlcs[this.context].pixelFormat;
-		}
 	}
 	if (opts[this.context]) this.opts = opts[this.context];
 	
@@ -1292,7 +1284,7 @@ wjs.prototype.catchEvent = function(wjs_event,wjs_function) {
 };
 // end catch event function
 
-wjs.prototype.videoOut = function(newBool) {
+wjs.prototype.video = function(newBool) {
 	if (typeof newBool !== 'undefined') {
 		if (newBool === true) {
 			if (opts[this.context].zoom == 0) {
