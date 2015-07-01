@@ -242,7 +242,7 @@ wjs.prototype.addPlayer = function(wcpSettings) {
 		vlcs[newid].multiscreen = (typeof wcpSettings["multiscreen"] === "undefined") ? false : wcpSettings["multiscreen"];
 		$(newid).find(".wcp-toolbar").hide(0);
 		$(newid).find(".wcp-tooltip").hide(0);
-		$(newid).css({cursor: 'pointer'});
+		wjs(newid).wrapper.css({cursor: 'pointer'});
 	}
 
 	wjs(newid).canvas = $(newid)[0].firstChild.firstChild;
@@ -407,10 +407,10 @@ wjs.prototype.addPlayer = function(wcpSettings) {
 	wjs(newid).wrapper.parent().bind("mousemove",function(e) {
 		if (opts["#"+$(this).find(".wcp-wrapper")[0].id].uiHidden === false) {
 			if (vlcs["#"+$(this).find(".wcp-wrapper")[0].id].multiscreen && window.document.webkitFullscreenElement == null) {
-				$(this).css({cursor: 'default'});
+				$(this).find(".wcp-wrapper").css({cursor: 'pointer'});
 			} else {
 				clearTimeout(vlcs["#"+$(this).find(".wcp-wrapper")[0].id].hideUI);
-				$(this).css({cursor: 'default'});
+				$(this).find(".wcp-wrapper").css({cursor: 'default'});
 				
 				if (window.document.webkitFullscreenElement == null) {
 					if (opts["#"+$(this).find(".wcp-wrapper")[0].id].titleBar == "both" || opts["#"+$(this).find(".wcp-wrapper")[0].id].titleBar == "minimized") {
@@ -566,6 +566,12 @@ wjs.prototype.addPlayer = function(wcpSettings) {
 			isPlaying(wjs(i));
 		}
 	}(newid);
+	
+	vlcs[newid].vlc.onLengthChanged = function(i) {
+		return function(length) {
+			$(wjs(i).context).find(".wcp-time-total").text(parseTime(length));
+		}
+	}(newid);
 
 	vlcs[newid].vlc.onPaused = function(i) {
 		return function() {
@@ -663,9 +669,18 @@ wjs.prototype.addPlaylist = function(playlist) {
 			  if (playlist[item].title) this.vlc.playlist.items[this.vlc.playlist.itemCount-1].title = "[custom]"+playlist[item].title;
 			  this.vlc.playlist.items[this.vlc.playlist.itemCount-1].setting = "{}";
 			  var playerSettings = {};
-			  if (typeof playlist[item].aspectRatio !== 'undefined') playerSettings.aspectRatio = playlist[item].aspectRatio;
-			  if (typeof playlist[item].crop !== 'undefined') playerSettings.crop = playlist[item].crop;
-			  if (typeof playlist[item].zoom !== 'undefined') playerSettings.zoom = playlist[item].zoom;
+			  if (typeof playlist[item].aspectRatio !== 'undefined') {
+				  if (item == 0) opts[this.context].aspectRatio = playlist[item].aspectRatio;
+				  playerSettings.aspectRatio = playlist[item].aspectRatio;
+			  }
+			  if (typeof playlist[item].crop !== 'undefined') {
+				  if (item == 0) opts[this.context].crop = playlist[item].crop;
+				  playerSettings.crop = playlist[item].crop;
+			  }
+			  if (typeof playlist[item].zoom !== 'undefined') {
+				  if (item == 0) opts[this.context].zoom = playlist[item].zoom;
+				  playerSettings.zoom = playlist[item].zoom;
+			  }
 			  if (typeof playlist[item].subtitles !== 'undefined') playerSettings.subtitles = playlist[item].subtitles;
 			  if (Object.keys(playerSettings).length > 0) this.vlc.playlist.items[this.vlc.playlist.itemCount-1].setting = JSON.stringify(playerSettings);
 		  }
@@ -1527,7 +1542,6 @@ function isPlaying(wjsPlayer) {
 	}
 	var style = window.getComputedStyle($(wjsPlayer.allElements[0]).find(".wcp-status")[0]);
 	if (style.display !== 'none') $(wjsPlayer.allElements[0]).find(".wcp-status").fadeOut(1200);
-	$(wjsPlayer.allElements[0]).find(".wcp-time-total").text(parseTime(this.vlc.length));
 };
 
 function hasEnded(wjsPlayer) {
@@ -1718,7 +1732,7 @@ function wcp_hideUI(wjsWrapper) {
 		}
 		wjsWrapper.find(".wcp-toolbar").stop().fadeOut();
 		wjsWrapper.find(".wcp-tooltip").stop().fadeOut();
-		wjsWrapper.css({cursor: 'none'});
+		wjsWrapper.find(".wcp-wrapper").css({cursor: 'none'});
 	}
 }
 
