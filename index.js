@@ -38,8 +38,13 @@ if (!$("link[href='"+__dirname.replace("\\","/")+"/public/general.css']").length
 	window.document.styleSheets[0].addRule('.wcp-menu-items::-webkit-scrollbar-thumb','background-color: #e5e5e5; border-right: 13px solid rgba(0, 0, 0, 0); border-left: 21px solid rgba(0, 0, 0, 0); background-clip: padding-box;');
 }
 
-// clear wcjs-player from require cache when page changes
+// deinitializate when page changed
 window.onbeforeunload = function(e) {
+	// stop all players
+	for (var wjs_target in players) if (players.hasOwnProperty(wjs_target)) {
+		if (players[wjs_target].vlc) players[wjs_target].vlc.stop();
+	}
+	// clear wcjs-player from require cache when page changes
 	if (global.require.cache) {
 		for(module in global.require.cache) {
 			if(global.require.cache.hasOwnProperty(module) && module.indexOf("wcjs-player") > -1) {
