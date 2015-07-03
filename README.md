@@ -25,7 +25,7 @@ An Open Source Player for WebChimera.js (libvlc binding for node.js/io.js/NW.js/
 
 	player.addPlaylist("http://archive.org/download/CartoonClassics/Krazy_Kat_-_Keeping_Up_With_Krazy.mp4");
 
-	// from here on you can either call the player with 'player' or 'wjs("#player")'
+	// from here on you can either call the player with 'player' or 'new wjs("#player")'
 
 
 **Usage Example 2 (two players):**
@@ -53,7 +53,7 @@ An Open Source Player for WebChimera.js (libvlc binding for node.js/io.js/NW.js/
 	var player2 = new wjs("#player2").addPlayer({ autoplay: true });
 	player2.addPlaylist("http://archive.org/download/CartoonClassics/Krazy_Kat_-_Keeping_Up_With_Krazy.mp4");
 
-	// from here on you can either call the players with 'player' / 'player2' or 'wjs("#player1")' / 'wjs("#player2")'
+	// from here on you can either call the players with 'player' / 'player2' or 'new wjs("#player1")' / 'new wjs("#player2")'
 
 
 **Screenshots:**
@@ -68,4 +68,4 @@ WebChimera.js Player running on Electron (Mac)
 
 WebChimera.js Player Multiscreen Demo running on NW.js (Windows)
 
-<img src="http://webchimera.org/samples/wcjs-player-multiscreen.png">
+<img src="http://webchimera.org/samples/wcjs-player-5.png">
