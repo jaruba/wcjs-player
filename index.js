@@ -301,12 +301,17 @@ wjs.prototype.addPlayer = function(wcpSettings) {
 		}
 		if ([3,4,6].indexOf(vlc.state) > -1) {
 			if (buttonClass == "wcp-play") {
+				switchClass($(this).parents(".wcp-wrapper").find(".wcp-anim-basic")[0],"wcp-anim-icon-pause","wcp-anim-icon-play");
+				animatePause(wjsPlayer.wrapper[0].id);
 				wjsPlayer.play();
 			} else if (buttonClass == "wcp-pause") {
+				switchClass($(this).parents(".wcp-wrapper").find(".wcp-anim-basic")[0],"wcp-anim-icon-play","wcp-anim-icon-pause");
+				animatePause(wjsPlayer.wrapper[0].id);
 				wjsPlayer.pause();
 			} else if (buttonClass == "wcp-replay") {
-				vlc.stop();
+				switchClass($(this).parents(".wcp-wrapper").find(".wcp-anim-basic")[0],"wcp-anim-icon-pause","wcp-anim-icon-play");
 				animatePause(wjsPlayer.wrapper[0].id);
+				vlc.stop();
 				wjsPlayer.play();
 			} else if (buttonClass == "wcp-prev") {
 				if (vlc.playlist.currentItem > 0) {
@@ -326,6 +331,7 @@ wjs.prototype.addPlayer = function(wcpSettings) {
 		}
 		if ([5].indexOf(vlc.state) > -1) {
 			if (buttonClass == "wcp-play") {
+				switchClass($(this).parents(".wcp-wrapper").find(".wcp-anim-basic")[0],"wcp-anim-icon-pause","wcp-anim-icon-play");
 				animatePause(wjsPlayer.wrapper[0].id);
 				if (vlc.playlist.itemCount > 0) wjsPlayer.play();
 			}
@@ -352,12 +358,18 @@ wjs.prototype.addPlayer = function(wcpSettings) {
 				$(wcpWrapper).css({cursor: 'default'});
 				if (wjsPlayer.vlc.mute) wjsPlayer.mute(false);
 			} else {
+				if (vlc.state == 4) {
+					switchClass($(this).parent().find(".wcp-anim-basic")[0],"wcp-anim-icon-pause","wcp-anim-icon-play");		
+				} else if (vlc.state == 3) {		
+					switchClass($(this).parent().find(".wcp-anim-basic")[0],"wcp-anim-icon-play","wcp-anim-icon-pause");		
+				}
 				animatePause($(this).parent()[0].id);
 				wjsPlayer.togglePause();
 			}
 		}
 		if ([5].indexOf(vlc.state) > -1) {
 			if (!vlc.playing) {
+				switchClass($(this).parent().find(".wcp-anim-basic")[0],"wcp-anim-icon-pause","wcp-anim-icon-play");		
 				animatePause(wjsPlayer.wrapper[0].id);
 				if (vlc.playlist.itemCount > 0) wjsPlayer.play();
 			}
