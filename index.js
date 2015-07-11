@@ -1331,7 +1331,10 @@ wjs.prototype.fullscreen = function(newBool) {
 	if (typeof newBool !== 'undefined') {
 		if (newBool === true) return wcp_fullscreen_on(this);
 		else return wcp_fullscreen_off(this);
-	} else return this;
+	} else {
+		if (window.document.webkitFullscreenElement == null) return false;
+		else return true;
+	}
 };
 
 // html element selector
