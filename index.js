@@ -26,8 +26,15 @@ var vlcs = {},
 	volDrag = false,
 	firstTime = true,
 	http = require('http'),
-	events = require('events');
+	events = require('events'),
+	sleepId;
 	
+try {
+    var powerSaveBlocker = require('power-save-blocker');
+} catch (ex) {
+	var sleep = require('./dst/computer-sleep/sleep.js');
+}
+
 require('./dst/jquery-ui/sortable');
 
 if (!$("link[href='"+__dirname.replace("\\","/")+"/public/general.css']").length) {
@@ -576,6 +583,8 @@ wjs.prototype.addPlayer = function(wcpSettings) {
 				vlcs[wjs(i).context].events.emit('StateChangedInt',3);
 			}
 			isPlaying(wjs(i));
+			
+			preventSleep();
 		}
 	}(newid);
 	
@@ -591,6 +600,8 @@ wjs.prototype.addPlayer = function(wcpSettings) {
 				vlcs[wjs(i).context].lastState = "paused";
 				vlcs[wjs(i).context].events.emit('StateChanged','paused');
 				vlcs[wjs(i).context].events.emit('StateChangedInt',4);
+				
+				allowSleep();
 			}
 		}
 	}(newid);
@@ -604,6 +615,8 @@ wjs.prototype.addPlayer = function(wcpSettings) {
 			}
 			opts[wjs(i).context].keepHidden = true;
 			players[wjs(i).context].zoom(0);
+
+			allowSleep();
 		}
 	}(newid);
 	
@@ -615,6 +628,8 @@ wjs.prototype.addPlayer = function(wcpSettings) {
 				vlcs[wjs(i).context].events.emit('StateChangedInt',6);
 			}
 			hasEnded(wjs(i));
+			
+			allowSleep();
 		}
 	}(newid);
 	
@@ -625,6 +640,8 @@ wjs.prototype.addPlayer = function(wcpSettings) {
 				vlcs[wjs(i).context].events.emit('StateChanged','error');
 				vlcs[wjs(i).context].events.emit('StateChangedInt',7);
 			}
+			
+			allowSleep();
 		}
 	}(newid);
 	
@@ -2075,5 +2092,16 @@ function nl2br(str,is_xhtml) {
 }
 
 function gcd(a,b) {if(b>a) {temp = a; a = b; b = temp} while(b!=0) {m=a%b; a=b; b=m;} return a;}
+
+function preventSleep() {
+	if (typeof powerSaveBlocker !== 'undefined') sleepId = powerSaveBlocker.start('prevent-display-sleep');
+	else sleep.prevent();
+}
+
+function allowSleep() {
+	if (typeof powerSaveBlocker !== 'undefined') {
+		if (powerSaveBlocker.isStarted(sleepId)) powerSaveBlocker.stop(sleepId);
+	} else sleep.allow();
+}
 
 module.exports = wjs;
