@@ -138,8 +138,16 @@ wjs.prototype.pause = function() {
 
 wjs.prototype.playItem = function(i) {
 	if (typeof i !== 'undefined') {
-		if (i != this.vlc.playlist.currentItem || this.vlc.state == 6) {
+		if (i != this.vlc.playlist.currentItem) {
 			if (i < this.vlc.playlist.itemCount && i > -1) {
+				if (wjsPlayer.vlc.playlist.items[i].disabled) {
+					wjsPlayer.vlc.playlist.items[i].disabled = false;
+					if (this.wrapper.find(".wcp-playlist").is(":visible")) {
+						this.wrapper.find(".wcp-playlist-items:eq("+i+")").removeClass("wcp-disabled");
+					}
+					this.wrapper.find(".wcp-playlist").find(".wcp-menu-selected").removeClass("wcp-menu-selected");
+					this.wrapper.find(".wcp-playlist-items:eq("+i+")").addClass("wcp-menu-selected");
+				}
 				opts[this.context].keepHidden = true;
 				players[this.context].zoom(0);
 				
@@ -175,6 +183,16 @@ wjs.prototype.stop = function() {
 
 wjs.prototype.next = function() {
 	if (this.vlc.playlist.currentItem +1 < this.vlc.playlist.itemCount) {
+		
+		var noDisabled = true;
+		for (i = this.vlc.playlist.currentItem +1; i < this.vlc.playlist.itemCount; i++) {
+			if (!this.vlc.playlist.items[i].disabled) {
+				noDisabled = false;
+				break;
+			}
+		}
+		if (noDisabled) return false;
+		
 		opts[this.context].keepHidden = true;
 		players[this.context].zoom(0);
 		
@@ -194,6 +212,16 @@ wjs.prototype.next = function() {
 
 wjs.prototype.prev = function() {
 	if (this.vlc.playlist.currentItem > 0) {
+		
+		var noDisabled = true;
+		for (i = this.vlc.playlist.currentItem -1; i > -1; i--) {
+			if (!this.vlc.playlist.items[i].disabled) {
+				noDisabled = false;
+				break;
+			}
+		}
+		if (noDisabled) return false;
+
 		opts[this.context].keepHidden = true;
 		players[this.context].zoom(0);
 		
@@ -897,10 +925,33 @@ wjs.prototype.rate = function(newRate) {
 	return this;
 }
 
-wjs.prototype.currentItem = function(newItem) {
-	if (typeof newItem === 'number') {
-		if (this.vlc.playlist.currentItem == newItem)
-		this.vlc.playlist.currentItem = newItem;
+wjs.prototype.currentItem = function(i) {
+	if (typeof i !== 'undefined') {
+		if (i != this.vlc.playlist.currentItem) {
+			if (i < this.vlc.playlist.itemCount && i > -1) {
+				if (wjsPlayer.vlc.playlist.items[i].disabled) {
+					wjsPlayer.vlc.playlist.items[i].disabled = false;
+					if (this.wrapper.find(".wcp-playlist").is(":visible")) {
+						this.wrapper.find(".wcp-playlist-items:eq("+i+")").removeClass("wcp-disabled");
+					}
+					this.wrapper.find(".wcp-playlist").find(".wcp-menu-selected").removeClass("wcp-menu-selected");
+					this.wrapper.find(".wcp-playlist-items:eq("+i+")").addClass("wcp-menu-selected");
+				}
+				opts[this.context].keepHidden = true;
+				players[this.context].zoom(0);
+				
+				wjs_button = this.wrapper.find(".wcp-play");
+				if (wjs_button.length != 0) wjs_button.removeClass("wcp-play").addClass("wcp-pause");
+				
+				wjs_button = this.wrapper.find(".wcp-replay");
+				if (wjs_button.length != 0) wjs_button.removeClass("wcp-replay").addClass("wcp-pause");
+		
+				this.vlc.playlist.currentItem = i;
+		
+				positionChanged(this,0);
+				this.wrapper.find(".wcp-time-current").text("00:00");
+			}
+		}
 	} else return this.vlc.playlist.currentItem;
 	return this;
 }
@@ -1764,15 +1815,37 @@ function printPlaylist(wjsPlayer) {
 			}
 			generatePlaylist += '<li class="wcp-menu-item wcp-playlist-item';
 			if (oi == vlc.playlist.currentItem) generatePlaylist += ' wcp-menu-selected';
-			generatePlaylist += '">'+vlc.playlist.items[oi].title.replace("[custom]","")+'</li>';
+			if (vlc.playlist.items[oi].disabled) generatePlaylist += ' wcp-disabled';
+			generatePlaylist += '"><img class="wcp-disabler-img" src="'+__dirname.replace("\\","/")+'/images/dragger.png"><div class="wcp-disabler-hold"><div class="wcp-disabler"><div class="wcp-disabler-dot"></div></div></div>'+vlc.playlist.items[oi].title.replace("[custom]","")+'</li>';
 		}
 		playlistItems.css('overflowY', 'scroll');
 		playlistItems.html("");
 		playlistItems.html(generatePlaylist);
+		wjsPlayer.wrapper.find(".wcp-disabler-hold").click(function(e) {
+			if (!e) var e = window.event;
+			e.cancelBubble = true;
+			if (e.stopPropagation) e.stopPropagation();
+			plItem = $(this).parent();
+			wjsPlayer = players["#"+$(this).parents(".wcp-wrapper")[0].id];
+			if (!plItem.hasClass("wcp-menu-selected")) {
+				if (!wjsPlayer.vlc.playlist.items[plItem.index()].disabled) {
+					plItem.addClass("wcp-disabled");
+					wjsPlayer.vlc.playlist.items[plItem.index()].disabled = true;
+				} else {
+					plItem.removeClass("wcp-disabled");
+					wjsPlayer.vlc.playlist.items[plItem.index()].disabled = false;
+				}
+			}
+		});
 		wjsPlayer.wrapper.find(".wcp-playlist-item").click(function() {
 			if (!$(this).hasClass("wcp-menu-selected")) {
+				wjsPlayer = players["#"+$(this).parents(".wcp-wrapper")[0].id];
+				if (wjsPlayer.vlc.playlist.items[$(this).index()].disabled) {
+					wjsPlayer.vlc.playlist.items[$(this).index()].disabled = false;
+					$(this).removeClass("wcp-disabled");
+				}
 				opts["#"+$(this).parents(".wcp-wrapper")[0].id].keepHidden = true;
-				players["#"+$(this).parents(".wcp-wrapper")[0].id].zoom(0);
+				wjsPlayer.zoom(0);
 				
 				wjs_button = $(wjs("#"+$(this).parents(".wcp-wrapper")[0].id).canvas).parents(".wcp-wrapper").find(".wcp-play");
 				if (wjs_button.length != 0) wjs_button.removeClass("wcp-play").addClass("wcp-pause");
@@ -1795,12 +1868,12 @@ function printPlaylist(wjsPlayer) {
               ui.item.data('start_pos', start_pos);
 		  },
 		  stop: function(e,ui) {
-			  $(".sortable-dragging").removeClass("sortable-dragging");
+			  $(this).parents(".wcp-wrapper").find(".sortable-dragging").removeClass("sortable-dragging");
 		  },
 		  update: function(e,ui) {
 			  var start_pos = ui.item.data('start_pos');
 			  var end_pos = ui.item.index();
-			  wjsPlayer.vlc.playlist.advanceItem(start_pos,(end_pos - start_pos));
+			  players["#"+$(this).parents(".wcp-wrapper")[0].id].vlc.playlist.advanceItem(start_pos,(end_pos - start_pos));
 		  }
 		});
 	} else playlistItems.html("");
