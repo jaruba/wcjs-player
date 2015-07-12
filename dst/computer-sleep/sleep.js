@@ -27,20 +27,16 @@
  
 module.exports = {
   prevent: function() {
-	if (!this._video) {
-		this._init();
-	}
+	if (!this._video) this._init();
 
 	this._video.setAttribute('loop', 'loop');
 	this._video.play();
   },
   allow: function() {
-	if (!this._video) {
-		this._init();
-	}
-	
+	if (!this._video) this._init();
+
 	this._video.removeAttribute('loop');
-	this._video.stop();
+	this._video.pause();
   },
   _init: function() {
     this._video = window.document.createElement('video');
