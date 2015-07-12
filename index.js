@@ -30,7 +30,7 @@ var vlcs = {},
 	sleepId;
 	
 try {
-    var powerSaveBlocker = require('power-save-blocker');
+    var powerSaveBlocker = require('remote').require('power-save-blocker');
 } catch (ex) {
 	var sleep = require('./dst/computer-sleep/sleep.js');
 }
