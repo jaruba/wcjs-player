@@ -359,11 +359,7 @@ wjs.prototype.addPlayer = function(wcpSettings) {
 				if (vlc.playlist.currentItem +1 < vlc.playlist.itemCount) {
 					wjsPlayer.next();
 				}
-			} else if (["wcp-volume-low","wcp-volume-medium","wcp-volume-high"].indexOf(buttonClass) > -1) {
-				switchClass(this,buttonClass,"wcp-mute");
-				wjsPlayer.toggleMute();
-			} else if (buttonClass == "wcp-mute") {
-				switchClass(this,buttonClass,"wcp-volume-medium");
+			} else if (["wcp-volume-low","wcp-volume-medium","wcp-volume-high","wcp-mute"].indexOf(buttonClass) > -1) {
 				wjsPlayer.toggleMute();
 			}
 		}
@@ -723,7 +719,6 @@ wjs.prototype.addPlaylist = function(playlist) {
 			this.vlc.playlist.playItem(0);
 		}
 		if ((opts[this.context].mute || opts[this.context].multiscreen) && this.vlc.mute === false) {
-			this.wrapper.find(".wcp-vol-button").removeClass("wcp-volume-medium").addClass("wcp-mute");
 			players[this.context].mute(true);
 		}
 	 }
@@ -890,9 +885,8 @@ wjs.prototype.mute = function(newMute) {
 		if (this.vlc.mute !== newMute) {
 			if (!this.vlc.mute) players[this.context].volume(0);
 			else {
-				this.wrapper.find(".wcp-vol-button").removeClass("wcp-mute").addClass("wcp-volume-medium");
-				if (opts[this.context].lastVolume <= 15) players[this.context].volume(100);
-				else players[this.context].volume(opts[this.context].lastVolume);
+				if (opts[this.context].lastVolume <= 15) opts[this.context].lastVolume = 100;
+				players[this.context].volume(opts[this.context].lastVolume);
 			}
 		} else return false;
 	} else return this.vlc.mute;
@@ -903,15 +897,17 @@ wjs.prototype.volume = function(newVolume) {
 		opts[this.context].lastVolume = this.vlc.volume;
 		this.vlc.volume = 0;
 		if (!this.vlc.mute) {
-			this.wrapper.find(".wcp-vol-button").removeClass("wcp-volume-medium").addClass("wcp-mute");
+			this.wrapper.find(".wcp-vol-button").removeClass("wcp-volume-medium").removeClass("wcp-volume-high").removeClass("wcp-volume-low").addClass("wcp-mute");
 			this.vlc.mute = true;
 		}
 		this.wrapper.find(".wcp-vol-bar-full").css("width", "0px");
 	} else if (newVolume && !isNaN(newVolume) && newVolume > 5 && newVolume <= 200) {
-		if (this.vlc.mute) {
-			this.wrapper.find(".wcp-vol-button").removeClass("wcp-mute").addClass("wcp-volume-medium");
-			this.vlc.mute = false;
-		}
+		if (this.vlc.mute) this.vlc.mute = false;
+
+		if (newVolume > 150) this.wrapper.find(".wcp-vol-button").removeClass("wcp-mute").removeClass("wcp-volume-medium").removeClass("wcp-volume-low").addClass("wcp-volume-high");
+		else if (newVolume > 50) this.wrapper.find(".wcp-vol-button").removeClass("wcp-mute").removeClass("wcp-volume-high").removeClass("wcp-volume-low").addClass("wcp-volume-medium");
+		else this.wrapper.find(".wcp-vol-button").removeClass("wcp-mute").removeClass("wcp-volume-medium").removeClass("wcp-volume-high").addClass("wcp-volume-low");
+
 		this.wrapper.find(".wcp-vol-bar-full").css("width", (((newVolume/200)*parseInt(this.wrapper.find(".wcp-vol-bar").css("width")))-parseInt(this.wrapper.find(".wcp-vol-bar-pointer").css("width")))+"px");
 		this.vlc.volume = parseInt(newVolume);
 	} else return parseInt(this.vlc.volume);
