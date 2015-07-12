@@ -39,6 +39,7 @@
 
 .wcp-menu-items {
 	margin-top: 6px;
+	padding: 0;
 	height: calc(100% - 32px);
 	width: 100%;
 	overflow-y: scroll;
@@ -64,6 +65,26 @@
 	background-color: #3d3d3d;
 	cursor: pointer;
 	color: #c0c0c0;
+}
+
+.sortable-dragging {
+	cursor: -webkit-grabbing !important;
+	background-color: #3d3d3d !important;
+	color: #c0c0c0 !important;
+	opacity: 0.8;
+}
+
+.sortable-placeholder {
+	border: 1px dashed #c0c0c0;
+	width: calc(100% - 20px);
+	margin-left: 1px;
+	height: 38px !important;
+	line-height: 38px !important;
+	padding-left: 14px;
+	overflow: hidden;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+	background: rgba(0,0,0,0.2);
 }
 
 .wcp-menu-close {
