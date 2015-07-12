@@ -2094,8 +2094,9 @@ function nl2br(str,is_xhtml) {
 function gcd(a,b) {if(b>a) {temp = a; a = b; b = temp} while(b!=0) {m=a%b; a=b; b=m;} return a;}
 
 function preventSleep() {
-	if (typeof powerSaveBlocker !== 'undefined') sleepId = powerSaveBlocker.start('prevent-display-sleep');
-	else sleep.prevent();
+	if (typeof powerSaveBlocker !== 'undefined') {
+		if (typeof sleepId === 'undefined' || !powerSaveBlocker.isStarted(sleepId)) sleepId = powerSaveBlocker.start('prevent-display-sleep');
+	} else sleep.prevent();
 }
 
 function allowSleep() {
