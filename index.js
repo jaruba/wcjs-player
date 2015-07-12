@@ -1668,12 +1668,15 @@ function autoResize() {
 	$('.webchimeras').each(function(i, obj) {
 		if ($(obj).find(".wcp-wrapper")[0]) {
 			var wjsPlayer = wjs("#"+$(obj).find(".wcp-wrapper")[0].id);
+
 			// resize status font size
-			var fontSize = (parseInt($(wjsPlayer.allElements[0]).height())/15);
-			if (fontSize < 20) fontSize = 20;
-			var fontSize = (parseInt($(wjsPlayer.allElements[0]).height())/15);
+			if (wjsPlayer.wrapper.width() <= 220) fontSize = 5;
+			else if (wjsPlayer.wrapper.width() > 220 && wjsPlayer.wrapper.width() <= 982) fontSize = ((wjsPlayer.wrapper.width() -220) /40) +9;
+			else fontSize = (parseInt($(wjsPlayer.allElements[0]).height())/15);
+
 			if (fontSize < 16) fontSize = 16;
-			if (fontSize > 31) fontSize = 31;
+			else if (fontSize > 31) fontSize = 31;
+
 			$(wjsPlayer.allElements[0]).find(".wcp-status").css('fontSize', fontSize);
 			$(wjsPlayer.allElements[0]).find(".wcp-subtitle-text").css('fontSize', fontSize);
 
