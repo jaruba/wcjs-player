@@ -1878,6 +1878,7 @@ function printPlaylist(wjsPlayer) {
 		});
 		wjsPlayer.wrapper.find(".wcp-playlist-items").sortable({
 		  placeholder: "sortable-placeholder",
+		  delay: 250,
 		  start: function(e,ui) {
 			  $(ui.item[0]).addClass("sortable-dragging");
 			  var start_pos = ui.item.index();
