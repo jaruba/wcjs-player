@@ -389,6 +389,20 @@
 	text-align: center
 }
 
+/* Notifications */
+.wcp-notif {
+	font-family: "OpenSans";
+	position: absolute;
+	top: 10px;
+	right: 15px;
+	width: 100%;
+	font-size: 20px;
+	z-index: 2;
+	color: #fff;
+	text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
+	text-align: right
+}
+
 /* Subtitle Text */
 .wcp-subtitle-text {
 	font-family: "OpenSans";

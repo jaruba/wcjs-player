@@ -288,7 +288,7 @@ wjs.prototype.addPlayer = function(wcpSettings) {
 
 	playerbody = '<div' + targetid + ' style="height: 100%"><div class="wcp-center" style="overflow: hidden"><canvas class="wcp-canvas wcp-center"></canvas></div><div class="wcp-surface"></div><div class="wcp-menu wcp-playlist wcp-center"><div class="wcp-menu-close"></div><div class="wcp-menu-title">Playlist Menu</div><ul class="wcp-menu-items wcp-playlist-items"></ul></div><div class="wcp-menu wcp-subtitles wcp-center"><div class="wcp-menu-close"></div><div class="wcp-menu-title">Subtitle Menu</div><ul class="wcp-menu-items wcp-subtitles-items"></ul></div><div class="wcp-pause-anim wcp-center"><i class="wcp-anim-basic wcp-anim-icon-play"></i></div><div class="wcp-titlebar"><span class="wcp-title"></span></div><div class="wcp-toolbar"><div></div><div class="wcp-progress-bar"><div class="wcp-progress-seen"></div><div class="wcp-progress-pointer"></div></div><div class="wcp-button wcp-left wcp-prev" style="display: none"></div><div class="wcp-button wcp-left wcp-pause"></div><div class="wcp-button wcp-left wcp-next" style="display: none"></div><div class="wcp-button wcp-left wcp-vol-button wcp-volume-medium"></div><div class="wcp-vol-control"><div class="wcp-vol-bar"><div class="wcp-vol-bar-full"></div><div class="wcp-vol-bar-pointer"></div></div></div><div class="wcp-time"><span class="wcp-time-current"></span><span class="wcp-time-total"></span></div><div class="wcp-button wcp-right wcp-maximize"';
 	if (!opts[newid].allowFullscreen) playerbody += ' style="cursor: not-allowed; color: rgba(123,123,123,0.6);"';
-	playerbody += '></div><div class="wcp-button wcp-right wcp-playlist-but"></div><div class="wcp-button wcp-right wcp-subtitle-but"></div></div><div class="wcp-status"></div><div class="wcp-subtitle-text"></div><div class="wcp-tooltip"><div class="wcp-tooltip-arrow"></div><div class="wcp-tooltip-inner">00:00</div></div></div>';
+	playerbody += '></div><div class="wcp-button wcp-right wcp-playlist-but"></div><div class="wcp-button wcp-right wcp-subtitle-but"></div></div><div class="wcp-status"></div><div class="wcp-notif"></div><div class="wcp-subtitle-text"></div><div class="wcp-tooltip"><div class="wcp-tooltip-arrow"></div><div class="wcp-tooltip-inner">00:00</div></div></div>';
 	
 	opts[newid].currentSub = 0;
 	opts[newid].trackSub = -1;
@@ -435,11 +435,13 @@ wjs.prototype.addPlayer = function(wcpSettings) {
 					if (opts["#"+$(this).find(".wcp-wrapper")[0].id].titleBar == "both" || opts["#"+$(this).find(".wcp-wrapper")[0].id].titleBar == "minimized") {
 						$(this).find(".wcp-titlebar").stop().show(0);
 						if ($(this).find(".wcp-status").css("top") == "10px") $(this).find(".wcp-status").css("top", "35px");
+						if ($(this).find(".wcp-notif").css("top") == "10px") $(this).find(".wcp-notif").css("top", "35px");
 					}
 				} else {
 					if (opts["#"+$(this).find(".wcp-wrapper")[0].id].titleBar == "both" || opts["#"+$(this).find(".wcp-wrapper")[0].id].titleBar == "fullscreen") {
 						$(this).find(".wcp-titlebar").stop().show(0);
 						if ($(this).find(".wcp-status").css("top") == "10px") $(this).find(".wcp-status").css("top", "35px");
+						if ($(this).find(".wcp-notif").css("top") == "10px") $(this).find(".wcp-notif").css("top", "35px");
 					}
 				}
 	
@@ -496,6 +498,8 @@ wjs.prototype.addPlayer = function(wcpSettings) {
 	var fontSize = (parseInt($(this.allElements[0]).height())/15);
 	if (fontSize < 20) fontSize = 20;
 	$(this.allElements[0]).find(".wcp-status").css('fontSize', fontSize);
+	$(this.allElements[0]).find(".wcp-notif").css('fontSize', fontSize);
+	$(this.allElements[0]).find(".wcp-subtitle-text").css('fontSize', fontSize);
 
 	// create player and attach event handlers
 	wjsPlayer = wjs(newid);
@@ -1398,6 +1402,14 @@ wjs.prototype.ui = function(newBool) {
 	} else return this;
 };
 
+wjs.prototype.notify = function(newMessage) {
+	wjsPlayer = players[this.context];
+	wjsPlayer.wrapper.find(".wcp-notif").text(newMessage);
+	wjsPlayer.wrapper.find(".wcp-notif").stop().show(0);
+	if (opts[this.context].notifTimer) clearTimeout(opts[this.context].notifTimer);
+	opts[this.context].notifTimer = setTimeout(function() { wjsPlayer.wrapper.find(".wcp-notif").fadeOut(1500); },1000);
+};
+
 wjs.prototype.toggleFullscreen = function() {
 	return wcp_toggleFullscreen(this);
 }
@@ -1427,6 +1439,10 @@ function wcp_fullscreen_on(wjsPlayer) {
 		if (opts[wjsPlayer.context].titleBar == "none" || opts[wjsPlayer.context].titleBar == "minimized") {
 			wjsPlayer.wrapper.find(".wcp-titlebar").hide(0);
 			if (wjsPlayer.wrapper.find(".wcp-status").css("top") == "35px") wjsPlayer.wrapper.find(".wcp-status").css("top", "10px");
+			if (wjsPlayer.wrapper.find(".wcp-notif").css("top") == "35px") wjsPlayer.wrapper.find(".wcp-notif").css("top", "10px");
+		} else {
+			if (wjsPlayer.wrapper.find(".wcp-status").css("top") == "10px") wjsPlayer.wrapper.find(".wcp-status").css("top", "35px");
+			if (wjsPlayer.wrapper.find(".wcp-notif").css("top") == "10px") wjsPlayer.wrapper.find(".wcp-notif").css("top", "35px");
 		}
 		wcpWrapper = wjsPlayer.wrapper[0];
 		if (wcpWrapper.webkitRequestFullscreen) wcpWrapper.webkitRequestFullscreen();
@@ -1444,6 +1460,10 @@ function wcp_fullscreen_off(wjsPlayer) {
 		if (opts[wjsPlayer.context].titleBar == "none" || opts[wjsPlayer.context].titleBar == "fullscreen") {
 			wjsPlayer.wrapper.find(".wcp-titlebar").hide(0);
 			if (wjsPlayer.wrapper.find(".wcp-status").css("top") == "35px") wjsPlayer.wrapper.find(".wcp-status").css("top", "10px");
+			if (wjsPlayer.wrapper.find(".wcp-notif").css("top") == "35px") wjsPlayer.wrapper.find(".wcp-notif").css("top", "10px");
+		} else {
+			if (wjsPlayer.wrapper.find(".wcp-status").css("top") == "10px") wjsPlayer.wrapper.find(".wcp-status").css("top", "35px");
+			if (wjsPlayer.wrapper.find(".wcp-notif").css("top") == "10px") wjsPlayer.wrapper.find(".wcp-notif").css("top", "35px");
 		}
 
 		
@@ -1535,10 +1555,9 @@ function isMediaChanged(wjsPlayer) {
 }
 
 function isBuffering(wjsPlayer,percent) {
-	var style = window.getComputedStyle($(wjsPlayer.allElements[0]).find(".wcp-status")[0]);
-	if (style.display === 'none') $(wjsPlayer.allElements[0]).find(".wcp-status").show(0);
-	$(wjsPlayer.allElements[0]).find(".wcp-status").text("Buffering "+percent+"%");
-	if (percent == 100) $(wjsPlayer.allElements[0]).find(".wcp-status").fadeOut(1200);
+	wjsPlayer.wrapper.find(".wcp-status").text("Buffering "+percent+"%");
+	wjsPlayer.wrapper.find(".wcp-status").stop().show(0);
+	if (percent == 100) wjsPlayer.wrapper.find(".wcp-status").fadeOut(1200);
 };
 
 function isPlaying(wjsPlayer) {
@@ -1701,6 +1720,7 @@ function autoResize() {
 			else if (fontSize > 31) fontSize = 31;
 
 			$(wjsPlayer.allElements[0]).find(".wcp-status").css('fontSize', fontSize);
+			$(wjsPlayer.allElements[0]).find(".wcp-notif").css('fontSize', fontSize);
 			$(wjsPlayer.allElements[0]).find(".wcp-subtitle-text").css('fontSize', fontSize);
 
 			singleResize(wjsPlayer,wjsPlayer.canvas.width,wjsPlayer.canvas.height);
@@ -1942,10 +1962,12 @@ function printSubtitles(wjsPlayer) {
 		if ($(this).index() == 0) {
 			vlcs["#"+wrapperId].vlc.subtitles.track = 0;
 			clearSubtitles(wjs("#"+wrapperId));
+			players["#"+wrapperId].notify("Subtitle Unloaded");
 		} else if ($(this).index() < vlcs["#"+wrapperId].vlc.subtitles.count) {
 			$(wjsPlayer.allElements[0]).find(".wcp-subtitle-text").html("");
 			opts[wjsPlayer.context].subtitles = [];
 			vlcs["#"+wrapperId].vlc.subtitles.track = $(this).index();
+			players["#"+wrapperId].notify("Subtitle: "+players["#"+wrapperId].subDesc($(this).index()).language);
 		} else {
 			$(wjsPlayer.allElements[0]).find(".wcp-subtitle-text").html("");
 			opts[wjsPlayer.context].subtitles = [];
@@ -1956,13 +1978,14 @@ function printSubtitles(wjsPlayer) {
 				newSub--;
 				if (newSub == 0) {
 					loadSubtitle(wjs("#"+wrapperId),target[k]);
+					players["#"+wrapperId].notify("Subtitle: "+k);
 					break;
 				}
 			}
 		}
+		players["#"+wrapperId].wrapper.find(".wcp-subtitles").hide(0);
 		opts["#"+wrapperId].currentSub = $(this).index();
 		opts["#"+wrapperId].subDelay = 0;
-		printSubtitles(wjs("#"+wrapperId));
 	});
 	
 }
