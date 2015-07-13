@@ -595,7 +595,7 @@ wjs.prototype.addPlayer = function(wcpSettings) {
 	vlcs[newid].vlc.onLengthChanged = function(i) {
 		return function(length) {
 			if (length > 0) {
-				if ($(wjs(i).context).find(".wcp-time-total").text() == "") $(wjs(i).context).find(".wcp-time-total").text("00:00");
+				if ($(wjs(i).context).find(".wcp-time-current").text() == "") $(wjs(i).context).find(".wcp-time-current").text("00:00");
 				$(wjs(i).context).find(".wcp-time-total").text(" / "+parseTime(length));
 			} else $(wjs(i).context).find(".wcp-time-total").text("");
 		}
