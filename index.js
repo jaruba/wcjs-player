@@ -108,14 +108,21 @@ wjs.prototype.toggleMute = function() {
 wjs.prototype.togglePause = function() {
 	if (!this.vlc.playing) {
 		wjs_button = this.wrapper.find(".wcp-play");
-		if (wjs_button.length != 0) wjs_button.removeClass("wcp-play").addClass("wcp-pause");
+		if (wjs_button.length != 0) {
+			wjs_button.removeClass("wcp-play").addClass("wcp-pause");
+			switchClass(this.wrapper.find(".wcp-anim-basic")[0],"wcp-anim-icon-pause","wcp-anim-icon-play");
+		}
 		
 		wjs_button = this.wrapper.find(".wcp-replay");
-		if (wjs_button.length != 0) wjs_button.removeClass("wcp-replay").addClass("wcp-pause");
+		if (wjs_button.length != 0) {
+			wjs_button.removeClass("wcp-replay").addClass("wcp-pause");
+			switchClass(this.wrapper.find(".wcp-anim-basic")[0],"wcp-anim-icon-pause","wcp-anim-icon-play");
+		}
 		
 		if (this.vlc.playlist.itemCount > 0) this.vlc.playlist.play();
 	} else {
 		this.wrapper.find(".wcp-pause").removeClass("wcp-pause").addClass("wcp-play");
+		switchClass(this.wrapper.find(".wcp-anim-basic")[0],"wcp-anim-icon-play","wcp-anim-icon-pause");
 		this.vlc.playlist.pause();
 	}
 	return this;
@@ -123,6 +130,8 @@ wjs.prototype.togglePause = function() {
 
 wjs.prototype.play = function(mrl) {
 	if (!this.vlc.playing) {
+		switchClass(this.wrapper.find(".wcp-anim-basic")[0],"wcp-anim-icon-pause","wcp-anim-icon-play");
+
 		wjs_button = this.wrapper.find(".wcp-play");
 		if (wjs_button.length != 0) wjs_button.removeClass("wcp-play").addClass("wcp-pause");
 		
@@ -137,6 +146,7 @@ wjs.prototype.play = function(mrl) {
 
 wjs.prototype.pause = function() {
 	if (this.vlc.playing) {
+		switchClass(this.wrapper.find(".wcp-anim-basic")[0],"wcp-anim-icon-play","wcp-anim-icon-pause");
 		this.wrapper.find(".wcp-pause").removeClass("wcp-pause").addClass("wcp-play");
 		this.vlc.playlist.pause();
 	}
@@ -342,19 +352,11 @@ wjs.prototype.addPlayer = function(wcpSettings) {
 			else wcp_showSubtitles(wjsPlayer);
 		}
 		if ([3,4,6].indexOf(vlc.state) > -1) {
-			if (buttonClass == "wcp-play") {
-				switchClass($(this).parents(".wcp-wrapper").find(".wcp-anim-basic")[0],"wcp-anim-icon-pause","wcp-anim-icon-play");
-				animatePause(wjsPlayer.wrapper[0].id);
-				wjsPlayer.play();
-			} else if (buttonClass == "wcp-pause") {
-				switchClass($(this).parents(".wcp-wrapper").find(".wcp-anim-basic")[0],"wcp-anim-icon-play","wcp-anim-icon-pause");
-				animatePause(wjsPlayer.wrapper[0].id);
-				wjsPlayer.pause();
-			} else if (buttonClass == "wcp-replay") {
-				switchClass($(this).parents(".wcp-wrapper").find(".wcp-anim-basic")[0],"wcp-anim-icon-pause","wcp-anim-icon-play");
-				animatePause(wjsPlayer.wrapper[0].id);
+			if (buttonClass == "wcp-play") wjsPlayer.play().animatePause();
+			else if (buttonClass == "wcp-pause") wjsPlayer.pause().animatePause();
+			else if (buttonClass == "wcp-replay") {
 				vlc.stop();
-				wjsPlayer.play();
+				wjsPlayer.play().animatePause();
 			} else if (buttonClass == "wcp-prev") {
 				if (vlc.playlist.currentItem > 0) {
 					wjsPlayer.prev();
@@ -367,18 +369,9 @@ wjs.prototype.addPlayer = function(wcpSettings) {
 				wjsPlayer.toggleMute();
 			}
 		}
-		if ([5].indexOf(vlc.state) > -1) {
-			if (buttonClass == "wcp-play") {
-				switchClass($(this).parents(".wcp-wrapper").find(".wcp-anim-basic")[0],"wcp-anim-icon-pause","wcp-anim-icon-play");
-				animatePause(wjsPlayer.wrapper[0].id);
-				if (vlc.playlist.itemCount > 0) wjsPlayer.play();
-			}
-		}
-		if (buttonClass == "wcp-minimize") {
-			wcp_fullscreen_off(wjsPlayer);
-		} else if (buttonClass == "wcp-maximize") {
-			wcp_fullscreen_on(wjsPlayer);
-		}
+		if ([5].indexOf(vlc.state) > -1 && buttonClass == "wcp-play") if (vlc.playlist.itemCount > 0) wjsPlayer.play().animatePause();
+		if (buttonClass == "wcp-minimize") wcp_fullscreen_off(wjsPlayer);
+		else if (buttonClass == "wcp-maximize") wcp_fullscreen_on(wjsPlayer);
 	});
 	
 	// surface click actions
@@ -396,22 +389,10 @@ wjs.prototype.addPlayer = function(wcpSettings) {
 				$(wcpWrapper).css({cursor: 'default'});
 				if (wjsPlayer.vlc.mute) wjsPlayer.mute(false);
 			} else {
-				if (vlc.state == 4) {
-					switchClass($(this).parent().find(".wcp-anim-basic")[0],"wcp-anim-icon-pause","wcp-anim-icon-play");		
-				} else if (vlc.state == 3) {		
-					switchClass($(this).parent().find(".wcp-anim-basic")[0],"wcp-anim-icon-play","wcp-anim-icon-pause");		
-				}
-				animatePause($(this).parent()[0].id);
-				wjsPlayer.togglePause();
+				wjsPlayer.togglePause().animatePause();
 			}
 		}
-		if ([5].indexOf(vlc.state) > -1) {
-			if (!vlc.playing) {
-				switchClass($(this).parent().find(".wcp-anim-basic")[0],"wcp-anim-icon-pause","wcp-anim-icon-play");		
-				animatePause(wjsPlayer.wrapper[0].id);
-				if (vlc.playlist.itemCount > 0) wjsPlayer.play();
-			}
-		}
+		if ([5].indexOf(vlc.state) > -1 && !vlc.playing && vlc.playlist.itemCount > 0) wjsPlayer.play().animatePause();
 	});
 	
 	wjs(newid).wrapper.find(".wcp-surface").dblclick(function() {
@@ -1424,6 +1405,14 @@ wjs.prototype.fullscreen = function(newBool) {
 	}
 };
 
+wjs.prototype.animatePause = function() {
+	$(this.context).find(".wcp-anim-basic").css("fontSize", "50px");
+	$(this.context).find(".wcp-anim-basic").css("padding", "7px 27px");
+	$(this.context).find(".wcp-anim-basic").css("borderRadius", "12px");
+	$(this.context).find(".wcp-pause-anim").fadeIn(200).fadeOut(200);
+	$(this.context).find(".wcp-anim-basic").animate({ fontSize: "80px", padding: "7px 30px" },400);
+}
+
 // html element selector
 function sel(context) {
 	return $($(this).parents(".wcp-wrapper")[0]).find(context);
@@ -1738,14 +1727,6 @@ function switchClass(el,fclass,sclass) {
 		el.classList.remove(fclass);
 		el.classList.add(sclass);
 	}
-}
-
-function animatePause(i) {
-	$("#"+i).find(".wcp-anim-basic").css("fontSize", "50px");
-	$("#"+i).find(".wcp-anim-basic").css("padding", "7px 27px");
-	$("#"+i).find(".wcp-anim-basic").css("borderRadius", "12px");
-	$("#"+i).find(".wcp-pause-anim").fadeIn(200).fadeOut(200);
-	$("#"+i).find(".wcp-anim-basic").animate({ fontSize: "80px", padding: "7px 30px" },400);
 }
 
 function parseTime(t,total) {
