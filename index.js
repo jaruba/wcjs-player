@@ -38,7 +38,7 @@ try {
 
 require('./dst/jquery-ui/sortable');
 
-var relbase = path.relative(path.dirname(require.main.filename), __dirname);
+var relbase = "/"+path.relative(path.dirname(require.main.filename), __dirname);
 
 
 if (!$("link[href='"+relbase+"/public/general.css']").length) {
