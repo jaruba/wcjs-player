@@ -27,6 +27,7 @@ var vlcs = {},
 	firstTime = true,
 	http = require('http'),
 	events = require('events'),
+	path = require('path'),
 	sleepId;
 	
 try {
@@ -37,9 +38,12 @@ try {
 
 require('./dst/jquery-ui/sortable');
 
-if (!$("link[href='"+__dirname.replace("\\","/")+"/public/general.css']").length) {
+var relbase = path.relative(path.dirname(require.main.filename), __dirname);
+
+
+if (!$("link[href='"+relbase+"/public/general.css']").length) {
 	// inject stylesheet
-	$('<link href="'+__dirname.replace("\\","/")+'/public/general.css" rel="stylesheet">').appendTo("head");
+	$('<link href="'+relbase+'/public/general.css" rel="stylesheet">').appendTo("head");
 	
 	// inject scrollbar css
 	window.document.styleSheets[0].addRule('.wcp-menu-items::-webkit-scrollbar','width: 44px !important;');
@@ -1849,7 +1853,7 @@ function printPlaylist(wjsPlayer) {
 			generatePlaylist += '<li class="wcp-menu-item wcp-playlist-item';
 			if (oi == vlc.playlist.currentItem) generatePlaylist += ' wcp-menu-selected';
 			if (vlc.playlist.items[oi].disabled) generatePlaylist += ' wcp-disabled';
-			generatePlaylist += '"><img class="wcp-disabler-img" src="'+__dirname.replace("\\","/")+'/images/dragger.png"><div class="wcp-disabler-hold"><div class="wcp-disabler"><div class="wcp-disabler-dot"></div></div></div>'+vlc.playlist.items[oi].title.replace("[custom]","")+'</li>';
+			generatePlaylist += '"><img class="wcp-disabler-img" src="'+relbase+'/images/dragger.png"><div class="wcp-disabler-hold"><div class="wcp-disabler"><div class="wcp-disabler-dot"></div></div></div>'+vlc.playlist.items[oi].title.replace("[custom]","")+'</li>';
 		}
 		playlistItems.css('overflowY', 'scroll');
 		playlistItems.html("");
