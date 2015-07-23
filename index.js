@@ -502,13 +502,12 @@ wjs.prototype.addPlayer = function(wcpSettings) {
 	if (wcpSettings && wcpSettings["vlcArgs"]) vlcs[newid].vlc = vlcs[newid].renderer.init(wjs(newid).canvas,wcpSettings["vlcArgs"]);
 	else vlcs[newid].vlc = vlcs[newid].renderer.init(wjs(newid).canvas);
 	
-	vlcs[newid].vlc.onFrameSetup = function(i) {
+	vlcs[newid].vlc.events.on("FrameSetup",function(i) {
 		return function(width, height, pixelFormat, videoFrame) {
-			i.renderer.frameSetup(i.canvas, width, height, pixelFormat, videoFrame);
-			
+			vlcs[i.context].events.emit('FrameSetup', width, height, pixelFormat, videoFrame);
 			singleResize(i, width, height, pixelFormat, videoFrame);
 		}
-	}(wjs(newid));
+	}(wjs(newid)));
 
 	vlcs[newid].vlc.onPositionChanged = function(i) {
 		return function(event) {
@@ -1316,6 +1315,7 @@ wjs.prototype.onState = function(wjs_function) { vlcs[this.context].events.on('S
 wjs.prototype.onStateInt = function(wjs_function) { vlcs[this.context].events.on('StateChangedInt',wjs_function); return this; }
 wjs.prototype.onTime = function(wjs_function) { this.catchEvent("TimeChanged",wjs_function); return this; }
 wjs.prototype.onPosition = function(wjs_function) { this.catchEvent("PositionChanged",wjs_function); return this; }
+wjs.prototype.onFrameSetup = function(wjs_function) { vlcs[this.context].events.on('FrameSetup',wjs_function); return this; }
 // end event proxies
 
 // catch event function
