@@ -1,15 +1,15 @@
 # WebChimera.js Player
-**Description:**
+**Description**
 
 An Open Source Player for WebChimera.js (libvlc binding for node.js/io.js/NW.js/Electron)
 
-**Prerequisites:**
+**Prerequisites**
 - [WebChimera.js prerequisites](https://github.com/RSATom/WebChimera.js#build-prerequisites)
 
-**Install:**
+**Install**
 - ``npm install wcjs-player``
 
-**Docs:**
+**Docs**
 - [JavaScript API Docs](https://github.com/jaruba/wcjs-player/wiki/JavaScript-API)
 
 **Suggestions**
@@ -17,7 +17,7 @@ An Open Source Player for WebChimera.js (libvlc binding for node.js/io.js/NW.js/
 
 - Although we have measures set in place to restore a WebGL context if it is lost, you can also use the ``--gpu-no-context-lost`` chromium arg if you want chromium to keep the WebGL context through power saving mode, screen saving mode, etc.
 
-**Usage Example 1:**
+**Usage Example 1**
 
 *HTML*
 
@@ -33,7 +33,7 @@ An Open Source Player for WebChimera.js (libvlc binding for node.js/io.js/NW.js/
 	// from here on you can either call the player with 'player' or 'new wjs("#player")'
 
 
-**Usage Example 2 (two players):**
+**Usage Example 2 (two players)**
 
 *CSS* (all player wrappers are natively assigned the ``webchimeras`` class)
 
@@ -61,7 +61,7 @@ An Open Source Player for WebChimera.js (libvlc binding for node.js/io.js/NW.js/
 	// from here on you can either call the players with 'player' / 'player2' or 'new wjs("#player1")' / 'new wjs("#player2")'
 
 
-**Screenshots:**
+**Screenshots**
 
 WebChimera.js Player running on NW.js (Windows)
 
