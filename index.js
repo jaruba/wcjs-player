@@ -792,8 +792,12 @@ wjs.prototype.subTrack = function(newTrack) {
 			} else {
 				$(this.allElements[0]).find(".wcp-subtitle-text").html("");
 				opts[this.context].subtitles = [];
+				
 				if (this.vlc.subtitles.track > 0) this.vlc.subtitles.track = 0;
-				newSub = newTrack - this.vlc.subtitles.count +1;
+				
+				if (this.vlc.subtitles.count > 0) newSub = newTrack - this.vlc.subtitles.count +1;
+				else newSub = newTrack - this.vlc.subtitles.count;
+				
 				itemSetting = JSON.parse(this.vlc.playlist.items[this.vlc.playlist.currentItem].setting);
 				target = itemSetting.subtitles;
 				for (var k in target) if (target.hasOwnProperty(k)) {
@@ -1999,68 +2003,29 @@ function loadSubtitle(wjsPlayer,subtitleElement) {
 				
 				var extension = subtitleElement.split('.').pop();
 				if (extension.toLowerCase() == "srt" || extension.toLowerCase() == "vtt") {
-										
-					srt = srt.replace(/\r\n|\r|\n/g, '\n');
+			
+					srt = strip(srt.replace(/\r\n|\r|\n/g, '\n'));
+			
+					var srty = srt.split('\n\n'),
+						si = 0;
 					
-					srt = strip(srt);
-					var srty = srt.split('\n\n');
-					
-					var s = 0;
-					
-					if (srty[0].substr(0,6).toLowerCase() == "webvtt") {
-						for (s = 0; s < srty.length; s++) {
-							var st = srty[s].split('\n');
-							if (st.length >=2) {
-								var n = st[0];
-								if (st[1].indexOf(' --> ') > -1) var stOrigin = st[1];
-								else if (st[2].indexOf(' --> ') > -1) var stOrigin = st[2];
-								else if (st[3].indexOf(' --> ') > -1) var stOrigin = st[3];
-								if (typeof stOrigin !== 'undefined') {
-									if (typeof stOrigin.split(' --> ')[0] === 'undefined') {
-										// print error
-										return;
-									}
-									if (typeof stOrigin.split(' --> ')[1] === 'undefined') {
-										//print error
-										return;
-									}
-									var is = Math.round(toSeconds(strip(stOrigin.split(' --> ')[0])));
-									var os = Math.round(toSeconds(strip(stOrigin.split(' --> ')[1])));
-									var t = st[2];
-									if( st.length > 2) {
-										var j = 3;
-										for (j=3; j<st.length; j++) t = t + '\n'+st[j];
-									}
-									opts[wjsPlayer.context].subtitles[is] = {i:is, o: os, t: t};
-								}
-							}
-						}
-					} else {
-						for (s = 0; s < srty.length; s++) {
-							var st = srty[s].split('\n');
-							if (st.length >=2) {
-								var n = st[0];
-								if (st[1].indexOf(' --> ') > -1) var stOrigin = st[1];
-								else if (st[2].indexOf(' --> ') > -1) var stOrigin = st[2];
-								else if (st[3].indexOf(' --> ') > -1) var stOrigin = st[3];
-								if (typeof stOrigin !== 'undefined') {
-									if (typeof stOrigin.split(' --> ')[0] === 'undefined') {
-										// print error
-										return;
-									}
-									if (typeof stOrigin.split(' --> ')[1] === 'undefined') {
-										//print error
-										return;
-									}
-									var is = Math.round(toSeconds(strip(stOrigin.split(' --> ')[0])));
-									var os = Math.round(toSeconds(strip(stOrigin.split(' --> ')[1])));
-									var t = st[2];
-									if( st.length > 2) {
-										var j = 3;
-										for (j=3; j<st.length; j++) t = t + '\n'+st[j];
-									}
-									opts[wjsPlayer.context].subtitles[is] = {i:is, o: os, t: t};
-								}
+					if (srty[0].substr(0,6).toLowerCase() == "webvtt") si = 1;
+			
+					for (s = si; s < srty.length; s++) {
+						var st = srty[s].split('\n');
+						if (st.length >=2) {
+							var n = -1;
+							if (st[0].indexOf(' --> ') > -1) var n = 0;
+							else if (st[1].indexOf(' --> ') > -1) var n = 1;
+							else if (st[2].indexOf(' --> ') > -1)  var n = 2;
+							else if (st[3].indexOf(' --> ') > -1)  var n = 3;
+							if (n > -1) {
+								stOrigin = st[n]
+								var is = Math.round(toSeconds(strip(stOrigin.split(' --> ')[0])));
+								var os = Math.round(toSeconds(strip(stOrigin.split(' --> ')[1])));
+								var t = st[n+1];
+								if (st.length > n+2) for (j=n+2; j<st.length; j++) t = t + '\n'+st[j];
+								opts[wjsPlayer.context].subtitles[is] = {i:is, o: os, t: t};
 							}
 						}
 					}
