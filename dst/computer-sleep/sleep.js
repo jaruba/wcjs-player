@@ -24,6 +24,9 @@
      sleep.allow()
 
  */
+
+var path = require('path');
+var relbase = path.relative(path.dirname(require.main.filename), __dirname);
  
 module.exports = {
   prevent: function() {
@@ -47,12 +50,12 @@ module.exports = {
 	this._video.style.left = '-10px';
 
 	var source_mp4 = window.document.createElement('source');
-	source_mp4.setAttribute('src', __dirname.replace("\\","/")+'/resources/muted-blank.mp4');
+	source_mp4.setAttribute('src', relbase+'/resources/muted-blank.mp4');
 	source_mp4.setAttribute('type', 'video/mp4');
 	this._video.appendChild(source_mp4);
 
 	var source_ogg = window.document.createElement('source');
-	source_ogg.setAttribute('src', __dirname.replace("\\","/")+'/resources/muted-blank.ogv');
+	source_ogg.setAttribute('src', relbase+'/resources/muted-blank.ogv');
 	source_ogg.setAttribute('type', 'video/ogg');
 	this._video.appendChild(source_ogg);
 
