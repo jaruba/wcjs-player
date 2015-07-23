@@ -12,6 +12,11 @@ An Open Source Player for WebChimera.js (libvlc binding for node.js/io.js/NW.js/
 **Docs:**
 - [JavaScript API Docs](https://github.com/jaruba/wcjs-player/wiki/JavaScript-API)
 
+**Suggestions**
+- For Windows distribution it is recommended to use the ``--disable-d3d11`` chromium arg because we have received reports of Win 8.1 using a very high amount of resources while running WebGL in Chromium on Direct3D 11
+
+- Although we have measures set in place to restore a WebGL context if it is lost, you can also use the ``--gpu-no-context-lost`` chromium arg if you want chromium to keep the WebGL context through power saving mode, screen saving mode, etc.
+
 **Usage Example 1:**
 
 *HTML*
