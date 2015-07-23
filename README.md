@@ -19,7 +19,9 @@ An Open Source Player for WebChimera.js (libvlc binding for node.js/io.js/NW.js/
 
 - On Windows, if you changed the NW.js executable name from ``nw.exe``, then ``WebChimera.js.node`` cannot load the necessary dependencies from ``nw.exe`` anymore, to fix this, [download rename-import-dll](https://github.com/ironSource/rename-import-dll/releases), save ``rid.exe`` to your app's root directory, open a command prompt from your app folder and use:
 
-    rid.exe node_modules/wcjs-player/node_modules/wcjs-renderer/node_modules/webchimera.js/build/Release/WebChimera.js.node nw.exe app.exe
+```
+rid.exe node_modules/wcjs-player/node_modules/wcjs-renderer/node_modules/webchimera.js/build/Release/WebChimera.js.node nw.exe app.exe
+```
 
 where ``app.exe`` is the new name of your executable. ``rid.exe`` can be deleted after this task.
 
