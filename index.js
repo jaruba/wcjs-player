@@ -370,9 +370,9 @@ wjs.prototype.addPlayer = function(wcpSettings) {
                 wjsPlayer.find(".wcp-toolbar").stop().show(0);
                 if (!volDrag && !seekDrag) {
                     if ($(wjsPlayer.find(".wcp-toolbar").selector + ":hover").length > 0) {
-                        vlcs[wjsPlayer.context].hideUI = setTimeout(function(i) { return function() { hideUI.call(wjsPlayer); } }($(this)),3000);
+                        vlcs[wjsPlayer.context].hideUI = setTimeout(function(i) { return function() { hideUI.call(players[i]); } }(wjsPlayer.context),3000);
                         vlcs[wjsPlayer.context].timestampUI = Math.floor(Date.now() / 1000);
-                    } else vlcs[wjsPlayer.context].hideUI = setTimeout(function(i) { return function() { hideUI.call(wjsPlayer); } }($(this)),3000);
+                    } else vlcs[wjsPlayer.context].hideUI = setTimeout(function(i) { return function() { hideUI.call(players[i]); } }(wjsPlayer.context),3000);
                 }
             }
         }
@@ -1046,7 +1046,7 @@ function mouseClickEnd(e) {
     clearInterval(vlcs[this.context].hideUI);
     if (this.wrapper.css('cursor') == 'none') this.wrapper.css({cursor: 'default'});
     
-    vlcs[this.context].hideUI = setTimeout(function(i) { return function() { hideUI.call(this); } }(this.context),3000);
+    vlcs[this.context].hideUI = setTimeout(function(i) { return function() { hideUI.call(players[i]); } }(this.context),3000);
     if (seekDrag) {
         seekDrag = false;
         if (window.document.webkitFullscreenElement != null || $(".webchimeras").length == 1) seekDragEnded.call(this,e);
