@@ -27,39 +27,39 @@
 
 var path = require('path');
 var relbase = "/"+path.relative(path.dirname(require.main.filename), __dirname);
- 
+
 module.exports = {
   prevent: function() {
-	if (!this._video) this._init();
+    if (!this._video) this._init();
 
-	this._video.setAttribute('loop', 'loop');
-	this._video.play();
+    this._video.setAttribute('loop', 'loop');
+    this._video.play();
   },
   allow: function() {
-	if (!this._video) this._init();
+    if (!this._video) this._init();
 
-	this._video.removeAttribute('loop');
-	this._video.pause();
+    this._video.removeAttribute('loop');
+    this._video.pause();
   },
   _init: function() {
     this._video = window.document.createElement('video');
     this._video.setAttribute('width', '10');
-	this._video.setAttribute('height', '10');
-	this._video.style.position = 'absolute';
-	this._video.style.top = '-10px';
-	this._video.style.left = '-10px';
+    this._video.setAttribute('height', '10');
+    this._video.style.position = 'absolute';
+    this._video.style.top = '-10px';
+    this._video.style.left = '-10px';
 
-	var source_mp4 = window.document.createElement('source');
-	source_mp4.setAttribute('src', relbase+'/resources/muted-blank.mp4');
-	source_mp4.setAttribute('type', 'video/mp4');
-	this._video.appendChild(source_mp4);
+    var source_mp4 = window.document.createElement('source');
+    source_mp4.setAttribute('src', relbase+'/resources/muted-blank.mp4');
+    source_mp4.setAttribute('type', 'video/mp4');
+    this._video.appendChild(source_mp4);
 
-	var source_ogg = window.document.createElement('source');
-	source_ogg.setAttribute('src', relbase+'/resources/muted-blank.ogv');
-	source_ogg.setAttribute('type', 'video/ogg');
-	this._video.appendChild(source_ogg);
+    var source_ogg = window.document.createElement('source');
+    source_ogg.setAttribute('src', relbase+'/resources/muted-blank.ogv');
+    source_ogg.setAttribute('type', 'video/ogg');
+    this._video.appendChild(source_ogg);
 
-	window.document.body.appendChild(this._video);
+    window.document.body.appendChild(this._video);
   },
   _video: null
 };
