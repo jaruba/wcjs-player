@@ -35,8 +35,8 @@ require('jquery-ui/sortable');
 try{var powerSaveBlocker=require('remote').require('power-save-blocker')}catch(ex){var sleep=require('computer-sleep/sleep')}
 
 // inject css
-if (!$("link[href='"+relbase+"/public/general.css']").length) {
-    $('<link href="'+relbase+'/public/general.css" rel="stylesheet">').appendTo("head");
+if (!$("link[href='"+relbase+"/css/general.css']").length) {
+    $('<link href="'+relbase+'/css/general.css" rel="stylesheet">').appendTo("head");
     window.document.styleSheets[0].addRule('.wcp-menu-items::-webkit-scrollbar','width: 44px !important;');
     window.document.styleSheets[0].addRule('.wcp-menu-items::-webkit-scrollbar-track','background-color: #696969 !important; border-right: 13px solid rgba(0, 0, 0, 0); border-left: 21px solid rgba(0, 0, 0, 0); background-clip: padding-box; -webkit-box-shadow: none !important;');
     window.document.styleSheets[0].addRule('.wcp-menu-items::-webkit-scrollbar-thumb','background-color: #e5e5e5; border-right: 13px solid rgba(0, 0, 0, 0); border-left: 21px solid rgba(0, 0, 0, 0); background-clip: padding-box; -webkit-box-shadow: none !important;');
