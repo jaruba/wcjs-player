@@ -19,6 +19,8 @@
     },
     "dependencies": {
         "wcjs-renderer": "*",
-        "jquery": "*"
+        "jquery": "*",
+        "jquery-ui": "jaruba/jquery-ui",
+		"computer-sleep" : "jaruba/computer-sleep"
     }
 }

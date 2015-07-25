@@ -31,8 +31,8 @@ var vlcs = {},
     relbase = "/"+path.relative(path.dirname(require.main.filename), __dirname),
     sleepId;
     
-require('./dst/jquery-ui/sortable');
-try{var powerSaveBlocker=require('remote').require('power-save-blocker')}catch(ex){var sleep=require('./dst/computer-sleep/sleep.js')}
+require('jquery-ui/sortable');
+try{var powerSaveBlocker=require('remote').require('power-save-blocker')}catch(ex){var sleep=require('computer-sleep/sleep')}
 
 // inject css
 if (!$("link[href='"+relbase+"/public/general.css']").length) {
