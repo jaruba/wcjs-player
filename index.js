@@ -644,9 +644,10 @@ wjs.prototype.addPlaylist = function(playlist) {
               if (Object.keys(playerSettings).length > 0) this.vlc.playlist.items[this.itemCount()-1].setting = JSON.stringify(playerSettings);
           }
      }
+
      if (this.state() == "idle") {
         if (opts[this.context].autoplay || opts[this.context].autostart) this.playItem(0);
-        if ((opts[this.context].mute || opts[this.context].multiscreen) && this.vlc.mute === false) players[this.context].mute(true);
+        if ((opts[this.context].mute || opts[this.context].multiscreen) && !this.mute()) this.mute(true);
      }
     
     if (this.find(".wcp-playlist").is(":visible")) printPlaylist.call(this);
