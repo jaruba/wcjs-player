@@ -906,6 +906,8 @@ wjs.prototype.state = function() {
 
 wjs.prototype.aspectRatio = function(newRatio) {
     if (typeof newRatio === 'string') {
+        opts[this.context].crop = "Default";
+        if (opts[this.context].zoom > 0) opts[this.context].zoom = 1;
         opts[this.context].aspectRatio = newRatio;
         autoResize();
     } else return opts[this.context].aspectRatio;
@@ -914,6 +916,8 @@ wjs.prototype.aspectRatio = function(newRatio) {
 
 wjs.prototype.crop = function(newCrop) {
     if (typeof newCrop === 'string') {
+        opts[this.context].aspectRatio = "Default";
+        if (opts[this.context].zoom > 0) opts[this.context].zoom = 1;
         opts[this.context].crop = newCrop;
         autoResize();
     } else return opts[this.context].crop;
@@ -922,6 +926,8 @@ wjs.prototype.crop = function(newCrop) {
 
 wjs.prototype.zoom = function(newZoom) {
     if (typeof newZoom === 'number') {
+        opts[this.context].aspectRatio = "Default";
+        opts[this.context].crop = "Default";
         opts[this.context].zoom = newZoom;
         autoResize();
     } else return opts[this.context].zoom;
@@ -1433,21 +1439,21 @@ function singleResize(width,height) {
     
     if (opts[this.context].crop != "Default" && opts[this.context].crop.indexOf(":") > -1) {
         if (cond) {
-            canvasParent.style.height = (100*opts[this.context].zoom)+"%";
-            canvasParent.style.width = ( ((container.height() * sourceAspect) / container.width() ) * 100 *opts[this.context].zoom) + "%";
+            canvasParent.style.height = "100%";
+            canvasParent.style.width = ( ((container.height() * sourceAspect) / container.width() ) * 100) + "%";
         } else {
-            canvasParent.style.height = ( ((container.width() / sourceAspect) /container.height() ) * 100*opts[this.context].zoom) + "%";
-            canvasParent.style.width = (100*opts[this.context].zoom)+"%";
+            canvasParent.style.height = ( ((container.width() / sourceAspect) /container.height() ) * 100) + "%";
+            canvasParent.style.width = "100%";
         }
         var sourceAspect = this.canvas.width / this.canvas.height;
-        futureWidth = ( ((canvasParent.offsetHeight * sourceAspect) / canvasParent.offsetWidth ) *opts[this.context].zoom *canvasParent.offsetWidth);
+        futureWidth = ( ((canvasParent.offsetHeight * sourceAspect) / canvasParent.offsetWidth ) *canvasParent.offsetWidth);
         if (futureWidth < canvasParent.offsetWidth) {
             var sourceAspect = this.canvas.height / this.canvas.width;
             this.canvas.style.width = canvasParent.offsetWidth+"px";
-            this.canvas.style.height = ( ((canvasParent.offsetWidth * sourceAspect) / canvasParent.offsetHeight ) *opts[this.context].zoom *canvasParent.offsetHeight) + "px";
+            this.canvas.style.height = ( ((canvasParent.offsetWidth * sourceAspect) / canvasParent.offsetHeight ) *canvasParent.offsetHeight) + "px";
         } else {
             this.canvas.style.height = canvasParent.offsetHeight+"px";
-            this.canvas.style.width = ( ((canvasParent.offsetHeight * sourceAspect) / canvasParent.offsetWidth ) *opts[this.context].zoom *canvasParent.offsetWidth) + "px";
+            this.canvas.style.width = ( ((canvasParent.offsetHeight * sourceAspect) / canvasParent.offsetWidth ) *canvasParent.offsetWidth) + "px";
         }
     } else {
         if (cond) {
