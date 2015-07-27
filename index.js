@@ -371,7 +371,7 @@ wjs.prototype.addPlayer = function(wcpSettings) {
                     } else vlcs[wjsPlayer.context].hideUI = setTimeout(function(i) { return function() { hideUI.call(players[i]); } }(wjsPlayer.context),3000);
                 }
             }
-        }
+        } else wjsPlayer.wrapper.css({cursor: 'default'});
     });
     
     /* Progress and Volume Bars */
