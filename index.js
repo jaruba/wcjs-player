@@ -1256,7 +1256,7 @@ function fullscreenOff() {
 // player event handlers
 function timePassed(t) {
     if (t > 0) this.find(".wcp-time-current").text(parseTime(t,this.vlc.length));
-    else if (this.find(".wcp-time-current").text() != "") this.find(".wcp-time-current").text("");
+    else if (this.find(".wcp-time-current").text() != "" && this.find(".wcp-time-total").text() == "") this.find(".wcp-time-current").text("");
     
     if (typeof opts[this.context].subtitles === 'undefined') opts[this.context].subtitles = [];
     
