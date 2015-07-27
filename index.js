@@ -1411,7 +1411,9 @@ function singleResize(width,height) {
     this.canvas.width = width;
     this.canvas.height = height;
 
-    var container = $(this.context);
+    var container = $(this.context),
+        canvasParent = $(this.canvas).parent()[0];
+
     if (opts[this.context].aspectRatio != "Default" && opts[this.context].aspectRatio.indexOf(":") > -1) {
         var res = opts[this.context].aspectRatio.split(":");
         var ratio = gcd(this.canvas.width,this.canvas.height);
@@ -1431,27 +1433,29 @@ function singleResize(width,height) {
     
     if (opts[this.context].crop != "Default" && opts[this.context].crop.indexOf(":") > -1) {
         if (cond) {
-            $(this.canvas).parent()[0].style.height = (100*opts[this.context].zoom)+"%";
-            $(this.canvas).parent()[0].style.width = ( ((container.height() * sourceAspect) / container.width() ) * 100 *opts[this.context].zoom) + "%";
+            canvasParent.style.height = (100*opts[this.context].zoom)+"%";
+            canvasParent.style.width = ( ((container.height() * sourceAspect) / container.width() ) * 100 *opts[this.context].zoom) + "%";
         } else {
-            $(this.canvas).parent()[0].style.height = ( ((container.width() / sourceAspect) /container.height() ) * 100*opts[this.context].zoom) + "%";
-            $(this.canvas).parent()[0].style.width = (100*opts[this.context].zoom)+"%";
+            canvasParent.style.height = ( ((container.width() / sourceAspect) /container.height() ) * 100*opts[this.context].zoom) + "%";
+            canvasParent.style.width = (100*opts[this.context].zoom)+"%";
         }
         var sourceAspect = this.canvas.width / this.canvas.height;
-        if ((parseInt($(this.canvas).parent()[0].style.width) /100 * container.width()) > (parseInt($(this.canvas).parent()[0].style.height) /100 * container.height())) {
-            this.canvas.style.height = ( (((parseInt($(this.canvas).parent()[0].style.width) /100 * container.width()) / sourceAspect) /(parseInt($(this.canvas).parent()[0].style.height) /100 * container.height()) ) *opts[this.context].zoom*(parseInt($(this.canvas).parent()[0].style.height) /100 * container.height())) + "px";
-            this.canvas.style.width = (parseInt($(this.canvas).parent()[0].style.width) /100 * container.width())+"px";
+        futureWidth = ( ((canvasParent.offsetHeight * sourceAspect) / canvasParent.offsetWidth ) *opts[this.context].zoom *canvasParent.offsetWidth);
+        if (futureWidth < canvasParent.offsetWidth) {
+            var sourceAspect = this.canvas.height / this.canvas.width;
+            this.canvas.style.width = canvasParent.offsetWidth+"px";
+            this.canvas.style.height = ( ((canvasParent.offsetWidth * sourceAspect) / canvasParent.offsetHeight ) *opts[this.context].zoom *canvasParent.offsetHeight) + "px";
         } else {
-            this.canvas.style.height = container.height()+"px";
-            this.canvas.style.width = ( ((container.height() * sourceAspect) / container.width() ) *opts[this.context].zoom *container.width()) + "px";
+            this.canvas.style.height = canvasParent.offsetHeight+"px";
+            this.canvas.style.width = ( ((canvasParent.offsetHeight * sourceAspect) / canvasParent.offsetWidth ) *opts[this.context].zoom *canvasParent.offsetWidth) + "px";
         }
     } else {
         if (cond) {
-            $(this.canvas).parent()[0].style.height = (100*opts[this.context].zoom)+"%";
-            $(this.canvas).parent()[0].style.width = ( ((container.height() * sourceAspect) / container.width() ) * 100 *opts[this.context].zoom) + "%";
+            canvasParent.style.height = (100*opts[this.context].zoom)+"%";
+            canvasParent.style.width = ( ((container.height() * sourceAspect) / container.width() ) * 100 *opts[this.context].zoom) + "%";
         } else {
-            $(this.canvas).parent()[0].style.height = ( ((container.width() / sourceAspect) /container.height() ) * 100*opts[this.context].zoom) + "%";
-            $(this.canvas).parent()[0].style.width = (100*opts[this.context].zoom)+"%";
+            canvasParent.style.height = ( ((container.width() / sourceAspect) /container.height() ) * 100*opts[this.context].zoom) + "%";
+            canvasParent.style.width = (100*opts[this.context].zoom)+"%";
         }
         this.canvas.style.height = "100%";
         this.canvas.style.width = "100%";
