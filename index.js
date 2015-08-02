@@ -1711,6 +1711,7 @@ function loadSubtitle(subtitleElement) {
     wjsPlayer = this;
     
     var ext = subtitleElement.split('.').pop().toLowerCase();
+    if (ext.indexOf("?") > -1) ext = ext.substr(0,ext.indexOf("?"));
 
     if (subtitleElement.startsWith("http://") || subtitleElement.startsWith("https://")) {
         request(subtitleElement, function (error, response, srt) {
