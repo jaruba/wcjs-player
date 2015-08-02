@@ -25,7 +25,8 @@ var vlcs = {},
     seekDrag = false,
     volDrag = false,
     firstTime = true,
-    http = require('http'),
+    fs = require('fs'),
+    request = require('request'),
     events = require('events'),
     path = require('path'),
     relbase = "./"+path.relative(path.dirname(require.main.filename), __dirname),
@@ -1707,66 +1708,72 @@ function loadSubtitle(subtitleElement) {
 
     if (subtitleElement.indexOf("http://dl.opensubtitles.org/") == 0) subtitleElement = "http://dl.opensubtitles.org/en/download/subencoding-utf8/file/"+subtitleElement.split('/').pop();
 
-    resData = "";
-    
     wjsPlayer = this;
-    var req = http.get(subtitleElement , function(res) {
-            res.on('data', function (data) {
-               resData += data;
-            });
-
-            res.on('end', function() {
-                var srt = resData;
-                opts[wjsPlayer.context].subtitles = [];
-                
-                var extension = subtitleElement.split('.').pop();
-                if (extension.toLowerCase() == "srt" || extension.toLowerCase() == "vtt") {
-            
-                    srt = strip(srt.replace(/\r\n|\r|\n/g, '\n'));
-            
-                    var srty = srt.split('\n\n'),
-                        si = 0;
-                    
-                    if (srty[0].substr(0,6).toLowerCase() == "webvtt") si = 1;
-            
-                    for (s = si; s < srty.length; s++) {
-                        var st = srty[s].split('\n');
-                        if (st.length >=2) {
-                            var n = -1;
-                            if (st[0].indexOf(' --> ') > -1) var n = 0;
-                            else if (st[1].indexOf(' --> ') > -1) var n = 1;
-                            else if (st[2].indexOf(' --> ') > -1)  var n = 2;
-                            else if (st[3].indexOf(' --> ') > -1)  var n = 3;
-                            if (n > -1) {
-                                stOrigin = st[n]
-                                var is = Math.round(toSeconds(strip(stOrigin.split(' --> ')[0])));
-                                var os = Math.round(toSeconds(strip(stOrigin.split(' --> ')[1])));
-                                var t = st[n+1];
-                                if (st.length > n+2) for (j=n+2; j<st.length; j++) t = t + '\n'+st[j];
-                                opts[wjsPlayer.context].subtitles[is] = {i:is, o: os, t: t};
-                            }
-                        }
-                    }
-                } else if (extension.toLowerCase() == "sub") {
-                    srt = srt.replace(/\r\n|\r|\n/g, '\n');
-                    
-                    srt = strip(srt);
-                    var srty = srt.split('\n');
     
-                    var s = 0;
-                    for (s = 0; s < srty.length; s++) {
-                        var st = srty[s].split('}{');
-                        if (st.length >=2) {
-                          var is = Math.round(st[0].substr(1) /10);
-                          var os = Math.round(st[1].split('}')[0] /10);
-                          var t = st[1].split('}')[1].replace('|', '\n');
-                          if (is != 1 && os != 1) opts[wjsPlayer.context].subtitles[is] = {i:is, o: os, t: t};
-                        }
-                    }
+    var ext = subtitleElement.split('.').pop().toLowerCase();
+
+    if (subtitleElement.startsWith("http://") || subtitleElement.startsWith("https://")) {
+        request(subtitleElement, function (error, response, srt) {
+            if (!error && response.statusCode == 200) processSub.call(wjsPlayer,srt,ext);
+            else wjsPlayer.notify("Subtitle Error");
+        });
+    } else {
+        fs.readFile(subtitleElement, function (err, srt) {
+            console.log(srt.toString('utf8'));
+            if (!err) processSub.call(wjsPlayer,srt.toString('utf8'),ext);
+            else wjsPlayer.notify("SubtitleError");
+        });
+    }
+}
+
+function processSub(srt,extension) {
+    opts[this.context].subtitles = [];
+
+    if (extension == "srt" || extension == "vtt") {
+
+        srt = strip(srt.replace(/\r\n|\r|\n/g, '\n'));
+
+        var srty = srt.split('\n\n'),
+            si = 0;
+        
+        if (srty[0].substr(0,6).toLowerCase() == "webvtt") si = 1;
+
+        for (s = si; s < srty.length; s++) {
+            var st = srty[s].split('\n');
+            if (st.length >=2) {
+                var n = -1;
+                if (st[0].indexOf(' --> ') > -1) var n = 0;
+                else if (st[1].indexOf(' --> ') > -1) var n = 1;
+                else if (st[2].indexOf(' --> ') > -1)  var n = 2;
+                else if (st[3].indexOf(' --> ') > -1)  var n = 3;
+                if (n > -1) {
+                    stOrigin = st[n]
+                    var is = Math.round(toSeconds(strip(stOrigin.split(' --> ')[0])));
+                    var os = Math.round(toSeconds(strip(stOrigin.split(' --> ')[1])));
+                    var t = st[n+1];
+                    if (st.length > n+2) for (j=n+2; j<st.length; j++) t = t + '\n'+st[j];
+                    opts[this.context].subtitles[is] = {i:is, o: os, t: t};
                 }
-                opts[wjsPlayer.context].trackSub = -1;
-            });
-    });
+            }
+        }
+    } else if (extension == "sub") {
+        srt = srt.replace(/\r\n|\r|\n/g, '\n');
+        
+        srt = strip(srt);
+        var srty = srt.split('\n');
+
+        var s = 0;
+        for (s = 0; s < srty.length; s++) {
+            var st = srty[s].split('}{');
+            if (st.length >=2) {
+              var is = Math.round(st[0].substr(1) /10);
+              var os = Math.round(st[1].split('}')[0] /10);
+              var t = st[1].split('}')[1].replace('|', '\n');
+              if (is != 1 && os != 1) opts[this.context].subtitles[is] = {i:is, o: os, t: t};
+            }
+        }
+    }
+    opts[this.context].trackSub = -1;
 }
 
 function preventSleep() {
