@@ -1674,7 +1674,8 @@ function printSubtitles() {
             wjsPlayer.find(".wcp-subtitle-text").html("");
             opts[wjsPlayer.context].subtitles = [];
             if (wjsPlayer.vlc.subtitles.track > 0) wjsPlayer.vlc.subtitles.track = 0;
-            newSub = $(this).index() - wjsPlayer.vlc.subtitles.count +1;
+            newSub = $(this).index() - wjsPlayer.vlc.subtitles.count;
+            if (wjsPlayer.vlc.subtitles.count) newSub++;
             itemSubtitles = itemSetting.subtitles;
             for (var k in itemSubtitles) if (itemSubtitles.hasOwnProperty(k)) {
                 newSub--;
