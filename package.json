@@ -21,7 +21,7 @@
         "wcjs-renderer": "*",
         "jquery": "*",
         "jquery-ui": "jaruba/jquery-ui",
-		"computer-sleep" : "jaruba/computer-sleep",
-		"request" : "*"
+        "computer-sleep" : "jaruba/computer-sleep",
+        "request" : "*"
     }
 }
