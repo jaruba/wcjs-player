@@ -415,12 +415,7 @@ wjs.prototype.addPlayer = function(wcpSettings) {
     });
     
     // set initial status message font size
-    if (wjs(newid).wrapper.width() <= 220) fontSize = 5;
-    else if (wjs(newid).wrapper.width() > 220 && wjs(newid).wrapper.width() <= 982) fontSize = ((wjs(newid).wrapper.width() -220) /40) +9;
-    else fontSize = wjs(newid).wrapper.height()/15;
-
-    if (fontSize < 16) fontSize = 16;
-    else if (fontSize > 31) fontSize = 31;
+    fontSize = calcFontSize(wjs(newid));
 
     wjs(newid).wrapper.find(".wcp-status").css('fontSize', fontSize);
     wjs(newid).wrapper.find(".wcp-notif").css('fontSize', fontSize);
@@ -1474,12 +1469,7 @@ function autoResize() {
         wjsPlayer = getContext(obj);
         if (wjsPlayer.wrapper[0]) {
             // resize status font size
-            if (wjsPlayer.wrapper.width() <= 220) fontSize = 5;
-            else if (wjsPlayer.wrapper.width() > 220 && wjsPlayer.wrapper.width() <= 982) fontSize = ((wjsPlayer.wrapper.width() -220) /40) +9;
-            else fontSize = wjsPlayer.wrapper.height()/15;
-
-            if (fontSize < 16) fontSize = 16;
-            else if (fontSize > 31) fontSize = 31;
+            fontSize = calcFontSize(wjsPlayer);
 
             wjsPlayer.find(".wcp-status").css('fontSize', fontSize);
             wjsPlayer.find(".wcp-notif").css('fontSize', fontSize);
@@ -1798,6 +1788,18 @@ function parseTime(t,total) {
 }
 function nl2br(str,is_xhtml) {
     breakTag=(is_xhtml||typeof is_xhtml==='undefined')?'<br />':'<br>';return (str+'').replace(/([^>\r\n]?)(\r\n|\n\r|\r|\n)/g,'$1'+breakTag+'$2');
+}
+function calcFontSize(wjsPlayer) {
+    if (wjsPlayer.wrapper.width() > 220 && wjsPlayer.wrapper.width() <= 982) {
+        fontSize = ((wjsPlayer.wrapper.width() -220) /40) +9;
+        if (fontSize < 16) fontSize = 16;
+    } else if (wjsPlayer.wrapper.width() > 982 && wjsPlayer.wrapper.width() <= 1600) {
+        fontSize = wjsPlayer.wrapper.height()/15;
+        if (fontSize > 31) fontSize = 31;
+    } else if (wjsPlayer.wrapper.width() > 1600) {
+        fontSize = ((wjsPlayer.wrapper.width() - 1600) / 35.5) +31;
+    }
+    return fontSize;
 }
 function toSeconds(t){s = 0.0;if(t){p=t.split(':');for(i=0;i<p.length;i++)s=s*60+parseFloat(p[i].replace(',', '.'))};return s}
 function strip(s){return s.replace(/^\s+|\s+$/g,"")}
