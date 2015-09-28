@@ -30,7 +30,8 @@ var vlcs = {},
     events = require('events'),
     path = require('path'),
     relbase = "./"+path.relative(path.dirname(require.main.filename), __dirname),
-    sleepId;
+    sleepId,
+	itsAudio = false;
     
 require('jquery-ui/sortable');
 try{var powerSaveBlocker=require('remote').require('power-save-blocker')}catch(ex){var sleep=require('computer-sleep/sleep')}
@@ -1177,6 +1178,20 @@ wjs.prototype.ui = function(newBool) {
     } else return this;
 }
 
+wjs.prototype.audioMode = function() {
+	itsAudio = true;
+	clearTimeout(vlcs[wjsPlayer.context].hideUI);
+    this.wrapper.css({cursor: 'default'});
+	this.find(".wcp-toolbar").stop().show(0);
+	this.find(".wcp-status").stop().hide(0);
+	this.find(".wcp-maximize").hide(0);
+}
+
+wjs.prototype.videoMode = function() {
+	itsAudio = false;
+	this.find(".wcp-maximize").show(0);
+}
+
 wjs.prototype.notify = function(newMessage) {
     this.find(".wcp-notif").text(newMessage);
     this.find(".wcp-notif").stop().show(0);
@@ -1305,7 +1320,7 @@ function isOpening() {
         this.find(".wcp-title")[0].innerHTML = this.itemDesc(this.currentItem()).title;
     }
     var style = window.getComputedStyle(this.find(".wcp-status")[0]);
-    if (style.display === 'none') this.find(".wcp-status").show();
+    if (style.display === 'none' && !itsAudio) this.find(".wcp-status").show();
     this.find(".wcp-status").text("Opening");
 }
 
@@ -1322,8 +1337,10 @@ function isMediaChanged() {
 
 function isBuffering(percent) {
     this.find(".wcp-status").text("Buffering "+percent+"%");
-    this.find(".wcp-status").stop().show(0);
-    if (percent == 100) this.find(".wcp-status").fadeOut(1200);
+    if (!itsAudio) {
+		this.find(".wcp-status").stop().show(0);
+	    if (percent == 100) this.find(".wcp-status").fadeOut(1200);
+	}
 }
 
 function isPlaying() {
@@ -1376,7 +1393,7 @@ function isPlaying() {
         
     }
     var style = window.getComputedStyle(this.find(".wcp-status")[0]);
-    if (style.display !== 'none') this.find(".wcp-status").fadeOut(1200);
+    if (style.display !== 'none' && !itsAudio) this.find(".wcp-status").fadeOut(1200);
 }
 
 function hasEnded() {
@@ -1467,7 +1484,7 @@ function singleResize(width,height) {
 function autoResize() {
     $('.webchimeras').each(function(i, obj) {
         wjsPlayer = getContext(obj);
-        if (wjsPlayer.wrapper[0]) {
+        if (wjsPlayer && wjsPlayer.wrapper && wjsPlayer.wrapper[0]) {
             // resize status font size
             fontSize = calcFontSize(wjsPlayer);
 
@@ -1481,20 +1498,22 @@ function autoResize() {
 }
 
 function hideUI() {
-    if (!(vlcs[this.context].multiscreen && window.document.webkitFullscreenElement == null)) {
-        if (seekDrag || volDrag || ($(this.find(".wcp-toolbar").selector + ":hover").length > 0 && vlcs[this.context].timestampUI + 20 > Math.floor(Date.now() / 1000))) {
-            vlcs[this.context].hideUI = setTimeout(function(i) { return function() { hideUI.call(i); } }(this),3000);
-            return;
-        }
-        if (window.document.webkitFullscreenElement == null) {
-            if (["both","minimized"].indexOf(opts[this.context].titleBar) > -1) this.find(".wcp-titlebar").stop().fadeOut();
-        } else {
-            if (["both","fullscreen"].indexOf(opts[this.context].titleBar) > -1) this.find(".wcp-titlebar").stop().fadeOut();
-        }
-        this.find(".wcp-toolbar").stop().fadeOut();
-        this.find(".wcp-tooltip").stop().fadeOut();
-        this.wrapper.css({cursor: 'none'});
-    }
+	if (!itsAudio) {
+		if (!(vlcs[this.context].multiscreen && window.document.webkitFullscreenElement == null)) {
+			if (seekDrag || volDrag || ($(this.find(".wcp-toolbar").selector + ":hover").length > 0 && vlcs[this.context].timestampUI + 20 > Math.floor(Date.now() / 1000))) {
+				vlcs[this.context].hideUI = setTimeout(function(i) { return function() { hideUI.call(i); } }(this),3000);
+				return;
+			}
+			if (window.document.webkitFullscreenElement == null) {
+				if (["both","minimized"].indexOf(opts[this.context].titleBar) > -1) this.find(".wcp-titlebar").stop().fadeOut();
+			} else {
+				if (["both","fullscreen"].indexOf(opts[this.context].titleBar) > -1) this.find(".wcp-titlebar").stop().fadeOut();
+			}
+			this.find(".wcp-toolbar").stop().fadeOut();
+			this.find(".wcp-tooltip").stop().fadeOut();
+			this.wrapper.css({cursor: 'none'});
+		}
+	}
 }
 
 function showPlaylist() {
