@@ -648,7 +648,7 @@ wjs.prototype.addPlaylist = function(playlist) {
      }
     
     if (this.find(".wcp-playlist").is(":visible")) printPlaylist.call(this);
-    if (this.itemCount() > 1) this.find(".wcp-playlist-but").css({ display: "block" });
+    if (this.itemCount() > 1 && !itsAudio) this.find(".wcp-playlist-but").css({ display: "block" });
 
     return this;
 }
