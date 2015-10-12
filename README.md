@@ -1,4 +1,5 @@
-# WebChimera.js Player
+# <img alt="WebChimera.js Player" src="https://cloud.githubusercontent.com/assets/1777923/10422134/9cb702a2-70be-11e5-98f8-1862dc3936d4.png">
+
 **Description**
 
 An Open Source Player for WebChimera.js (libvlc binding for node.js/io.js/NW.js/Electron)
