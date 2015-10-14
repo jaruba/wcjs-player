@@ -1,4 +1,4 @@
-# <img alt="WebChimera.js Player" src="https://cloud.githubusercontent.com/assets/1777923/10422134/9cb702a2-70be-11e5-98f8-1862dc3936d4.png">
+# <img alt="WebChimera.js Player" src="https://raw.githubusercontent.com/jaruba/wcjs-logos/master/logos/small/wcjs-player.png">
 
 **Description**
 
