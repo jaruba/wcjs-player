@@ -213,21 +213,21 @@ wjs.prototype.prev = function() {
 }
 
 wjs.prototype.addPlayer = function(wcpSettings) {
-    
+
     if (wcpSettings) newid = (typeof wcpSettings["id"] === "undefined") ? "webchimera" : wcpSettings["id"]; // if no id set, default to "webchimera"
     else newid = "webchimera";
-    
-    if (window.document.getElementById(newid) !== null) {
+
+    if (!wcpSettings.id && window.document.getElementById(newid) !== null) {
         for (i = 2; window.document.getElementById(newid +i) !== null; i++) { }
         newid = newid +i;
     }
-    
+
     if (typeof newid === 'string') {
         if (newid.substring(0,1) == "#") var targetid = ' id="'+newid.substring(1)+'" class="wcp-wrapper"';
         else if (newid.substring(0,1) == ".") { var targetid = ' id="webchimera" class="'+newid.substring(1)+' wcp-wrapper"'; newid = "#webchimera"; }
         else { var targetid = ' id="'+newid+'" class="wcp-wrapper"'; newid = "#"+newid; }
     } else { var targetid = ' id="webchimera" class="wcp-wrapper"'; newid = "#webchimera"; }
-    
+
     vlcs[newid] = {};
     vlcs[newid].events = new events.EventEmitter();
 
