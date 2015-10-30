@@ -219,7 +219,7 @@ wjs.prototype.addPlayer = function(wcpSettings) {
         $('<link href="'+ customCSS +'" rel="stylesheet">').appendTo("head");
     }
 
-    var attach = wcpSettings.attach;
+    var attach = wcpSettings && wcpSettings.attach;
 
     if (attach) {
         newid = attach;
