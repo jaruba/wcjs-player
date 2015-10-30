@@ -219,10 +219,10 @@ wjs.prototype.addPlayer = function(wcpSettings) {
         $('<link href="'+ customCSS +'" rel="stylesheet">').appendTo("head");
     }
 
-    var attach = wcpSettings && wcpSettings.attach;
+    var attach = (!wcpSettings || typeof wcpSettings.attach === 'undefined') ? true : wcpSettings.attach;
 
     if (attach) {
-        newid = attach;
+        newid = wcpSettings.id || 'webchimera';
     } else {
         if (wcpSettings) newid = (typeof wcpSettings["id"] === "undefined") ? "webchimera" : wcpSettings["id"]; // if no id set, default to "webchimera"
         else newid = "webchimera";
