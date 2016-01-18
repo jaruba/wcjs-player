@@ -30,7 +30,7 @@ var vlcs = {},
     events = require('events'),
     path = require('path'),
     relbase = "./"+path.relative(path.dirname(require.main.filename), __dirname),
-    sleepId;
+    sleepId = 0;
     
 require('jquery-ui/sortable');
 try{var powerSaveBlocker=require('remote').require('power-save-blocker')}catch(ex){var sleep=require('computer-sleep/sleep')}
