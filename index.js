@@ -1318,6 +1318,8 @@ function isMediaChanged() {
     this.find(".wcp-subtitle-but").hide(0);
     
     opts[this.context].firstTime = true;
+
+    vlcs[this.context].renderer.clearCanvas();
 }
 
 function isBuffering(percent) {
