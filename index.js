@@ -52,7 +52,7 @@ window.addEventListener('beforeunload', function(e) {
 
     // clear wcjs-player from require cache when page changes
     var clearModules = [
-        "wcjs-player,
+        "wcjs-player",
         "jquery" // https://github.com/jaruba/wcjs-player/issues/38
     ];
     for (var i in clearModules) {
