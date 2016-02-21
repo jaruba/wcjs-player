@@ -46,21 +46,27 @@ if (!$("link[href='"+relbase+"/css/general.css']").length) {
 }
 
 // deinitializate when page changed
-window.onbeforeunload = function(e) {
+window.addEventListener('beforeunload', function(e) {
     // stop all players
     for (var wjsIndex in players) if (players.hasOwnProperty(wjsIndex) && players[wjsIndex].vlc) players[wjsIndex].vlc.stop();
 
     // clear wcjs-player from require cache when page changes
-    if (global.require.cache) {
-        for (module in global.require.cache) {
-            if (global.require.cache.hasOwnProperty(module) && module.indexOf("wcjs-player") > -1) delete global.require.cache[module];
-        }
-    } else if (require.cache) {
-        for (module in require.cache) {
-            if (require.cache.hasOwnProperty(module) && module.indexOf("wcjs-player") > -1) delete require.cache[module];
+    var clearModules = [
+        "wcjs-player,
+        "jquery" // https://github.com/jaruba/wcjs-player/issues/38
+    ];
+    for (var i in clearModules) {
+        if (global.require.cache) {
+            for (module in global.require.cache) {
+                if (global.require.cache.hasOwnProperty(module) && module.indexOf(clearModules[i]) > -1) delete global.require.cache[module];
+            }
+        } else if (require.cache) {
+            for (module in require.cache) {
+                if (require.cache.hasOwnProperty(module) && module.indexOf(clearModules[i]) > -1) delete require.cache[module];
+            }
         }
     }
-}
+});
 
 function wjs(context) {
 
