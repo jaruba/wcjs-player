@@ -1706,8 +1706,6 @@ function loadSubtitle(subtitleElement) {
     if (typeof opts[this.context].subtitles === "undefined") opts[this.context].subtitles = [];
     else if (opts[this.context].subtitles.length) opts[this.context].subtitles = [];
 
-    if (subtitleElement.indexOf("http://dl.opensubtitles.org/") == 0) subtitleElement = "http://dl.opensubtitles.org/en/download/subencoding-utf8/file/"+subtitleElement.split('/').pop();
-
     wjsPlayer = this;
 
     var ext = subtitleElement.split('.').pop().toLowerCase();
