@@ -809,6 +809,7 @@ wjs.prototype.volume = function(newVolume) {
     if (typeof newVolume !== 'undefined' && !isNaN(newVolume) && newVolume >= 0 && newVolume <= 5) {
         opts[this.context].lastVolume = this.vlc.volume;
         this.vlc.volume = 0;
+        vlcs[this.context].events.emit('VolumeChange', 0);
         if (!this.vlc.mute) {
             this.find(".wcp-vol-button").removeClass("wcp-volume-medium").removeClass("wcp-volume-high").removeClass("wcp-volume-low").addClass("wcp-mute");
             this.vlc.mute = true;
@@ -823,6 +824,7 @@ wjs.prototype.volume = function(newVolume) {
 
         this.find(".wcp-vol-bar-full").css("width", (((newVolume/200)*parseInt(this.find(".wcp-vol-bar").css("width")))-parseInt(this.find(".wcp-vol-bar-pointer").css("width")))+"px");
         this.vlc.volume = parseInt(newVolume);
+        vlcs[this.context].events.emit('VolumeChange', parseInt(newVolume));
     } else return this.vlc.volume;
     return this;
 }
@@ -1840,4 +1842,5 @@ wjs.prototype.onStateInt=function(wjsFunction){vlcs[this.context].events.on('Sta
 wjs.prototype.onTime=function(wjsFunction){this.catchEvent("TimeChanged",wjsFunction);return this}
 wjs.prototype.onPosition=function(wjsFunction){this.catchEvent("PositionChanged",wjsFunction);return this}
 wjs.prototype.onFrameSetup=function(wjsFunction){vlcs[this.context].events.on('FrameSetup',wjsFunction);return this}
+wjs.prototype.onVolume=function(wjsFunction){vlcs[this.context].events.on('VolumeChange',wjsFunction);return this}
 module.exports = wjs;
