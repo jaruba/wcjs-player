@@ -1383,8 +1383,8 @@ function isPlaying() {
         opts[this.context].subDelay = 0;
 
         if (totalSubs > 0) this.find(".wcp-subtitle-but").show(0);
-		
-		vlcs[this.context].events.emit('FirstPlay');
+
+        vlcs[this.context].events.emit('FirstPlay');
     }
     var style = window.getComputedStyle(this.find(".wcp-status")[0]);
     if (style.display !== 'none') this.find(".wcp-status").fadeOut(1200);
