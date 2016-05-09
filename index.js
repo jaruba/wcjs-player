@@ -1383,7 +1383,8 @@ function isPlaying() {
         opts[this.context].subDelay = 0;
 
         if (totalSubs > 0) this.find(".wcp-subtitle-but").show(0);
-
+		
+		vlcs[this.context].events.emit('FirstPlay');
     }
     var style = window.getComputedStyle(this.find(".wcp-status")[0]);
     if (style.display !== 'none') this.find(".wcp-status").fadeOut(1200);
@@ -1841,4 +1842,5 @@ wjs.prototype.onTime=function(wjsFunction){this.catchEvent("TimeChanged",wjsFunc
 wjs.prototype.onPosition=function(wjsFunction){this.catchEvent("PositionChanged",wjsFunction);return this}
 wjs.prototype.onFrameSetup=function(wjsFunction){vlcs[this.context].events.on('FrameSetup',wjsFunction);return this}
 wjs.prototype.onVolume=function(wjsFunction){vlcs[this.context].events.on('VolumeChange',wjsFunction);return this}
+wjs.prototype.onFirstPlay=function(wjsFunction){vlcs[this.context].events.on('FirstPlay',wjsFunction);return this}
 module.exports = wjs;
