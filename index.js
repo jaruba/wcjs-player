@@ -1234,6 +1234,11 @@ function fullscreenOn() {
 
         switchClass(this.find(".wcp-maximize"),"wcp-maximize","wcp-minimize");
 
+        var that = this;
+        setTimeout(function() {
+            singleResize.call(that, that.canvas.width, that.canvas.height);
+        }, 200);
+
         return true;
     } else return false;
 }
@@ -1261,6 +1266,12 @@ function fullscreenOff() {
             this.wrapper.css({cursor: 'pointer'});
             if (!this.vlc.mute) this.vlc.mute = true;
         }
+
+        var that = this;
+        setTimeout(function() {
+            singleResize.call(that, that.canvas.width, that.canvas.height);
+        }, 200);
+
         return true;
     } else return false;
 }
