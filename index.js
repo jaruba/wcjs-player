@@ -446,8 +446,8 @@ wjs.prototype.addPlayer = function(wcpSettings) {
         if (!checkBuffer) wcpSettings["vlcArgs"].push("--network-caching="+wcpSettings["buffer"]);
     }
 
-    var vlc = wcpSettings["wcjs"].createPlayer(wcpSettings && wcpSettings["vlcArgs"] ? wcpSettings["vlcArgs"] : null )
-    vlcs[newid].vlc = vlcs[newid].renderer.bind(wjs(newid).canvas, vlc, wcpSettings["wcjsRendererOptions"] || null);
+    vlcs[newid].vlc = wcpSettings["wcjs"].createPlayer(wcpSettings && wcpSettings["vlcArgs"] ? wcpSettings["vlcArgs"] : null )
+    vlcs[newid].renderer.bind(wjs(newid).canvas, vlcs[newid].vlc, wcpSettings["wcjsRendererOptions"] || null);
 
     vlcs[newid].vlc.events.on("FrameSetup",function(i) {
         return function(width, height, pixelFormat, videoFrame) {
@@ -628,7 +628,9 @@ wjs.prototype.addPlaylist = function(playlist) {
                       } else playlist[item].vlcArgs = [playlist[item].vlcArgs];
                   }
                   this.vlc.playlist.addWithOptions(playlist[item].url,playlist[item].vlcArgs);
-              } else this.vlc.playlist.add(playlist[item].url);
+              } else {
+                  this.vlc.playlist.add(playlist[item].url);
+              }
               if (playlist[item].title) this.vlc.playlist.items[this.itemCount()-1].title = "[custom]"+playlist[item].title;
               this.vlc.playlist.items[this.itemCount()-1].setting = "{}";
               var playerSettings = {};
@@ -1329,7 +1331,7 @@ function isMediaChanged() {
 
     opts[this.context].firstTime = true;
 
-    vlcs[this.context].renderer.clearCanvas();
+    vlcs[this.context].renderer.clear(this.canvas);
 }
 
 function isBuffering(percent) {
