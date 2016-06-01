@@ -12,6 +12,7 @@ An Open Source Player for WebChimera.js (libvlc binding for node.js/io.js/NW.js/
 
 **Docs**
 - [JavaScript API Docs](https://github.com/jaruba/wcjs-player/wiki/JavaScript-API)
+- [Crazy Hacks](https://github.com/jaruba/wcjs-player/wiki/Crazy-Hacks)
 
 **Usage Example 1**
 
