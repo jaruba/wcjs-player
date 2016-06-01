@@ -446,7 +446,7 @@ wjs.prototype.addPlayer = function(wcpSettings) {
         if (!checkBuffer) wcpSettings["vlcArgs"].push("--network-caching="+wcpSettings["buffer"]);
     }
 
-    var vlc = wcpSettings["wcjs"](wcpSettings && wcpSettings["vlcArgs"] ? wcpSettings["vlcArgs"] : null )
+    var vlc = wcpSettings["wcjs"].createPlayer(wcpSettings && wcpSettings["vlcArgs"] ? wcpSettings["vlcArgs"] : null )
     vlcs[newid].vlc = vlcs[newid].renderer.bind(wjs(newid).canvas, vlc, wcpSettings["wcjsRendererOptions"] || null);
 
     vlcs[newid].vlc.events.on("FrameSetup",function(i) {
