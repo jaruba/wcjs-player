@@ -13,6 +13,7 @@ _alternatively, you could not use `wcjs-prebuilt` or `webchimera.js`, but implem
 **Docs**
 - [JavaScript API Docs](https://github.com/jaruba/wcjs-player/wiki/JavaScript-API)
 - [Crazy Hacks](https://github.com/jaruba/wcjs-player/wiki/Crazy-Hacks)
+- [Known issues and workarounds](https://github.com/RSATom/WebChimera.js#known-issues-and-workarounds)
 
 **Usage Example 1**
 
