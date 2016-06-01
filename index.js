@@ -220,6 +220,8 @@ wjs.prototype.prev = function() {
 
 wjs.prototype.addPlayer = function(wcpSettings) {
 
+    if (!wcpSettings["wcjs"]) console.error(new Error('Missing `wcjs` parameter in `.addPlayer()`'));
+
     if (wcpSettings) newid = (typeof wcpSettings["id"] === "undefined") ? "webchimera" : wcpSettings["id"]; // if no id set, default to "webchimera"
     else newid = "webchimera";
 
@@ -444,8 +446,8 @@ wjs.prototype.addPlayer = function(wcpSettings) {
         if (!checkBuffer) wcpSettings["vlcArgs"].push("--network-caching="+wcpSettings["buffer"]);
     }
 
-    if (wcpSettings && wcpSettings["vlcArgs"]) vlcs[newid].vlc = vlcs[newid].renderer.init(wjs(newid).canvas,wcpSettings["vlcArgs"],wcpSettings["wcjsRendererOptions"],wcpSettings["wcjs"]);
-    else vlcs[newid].vlc = vlcs[newid].renderer.init(wjs(newid).canvas);
+    var vlc = wcpSettings["wcjs"](wcpSettings && wcpSettings["vlcArgs"] ? wcpSettings["vlcArgs"] : null )
+    vlcs[newid].vlc = vlcs[newid].renderer.bind(wjs(newid).canvas, vlc, wcpSettings["wcjsRendererOptions"] || null);
 
     vlcs[newid].vlc.events.on("FrameSetup",function(i) {
         return function(width, height, pixelFormat, videoFrame) {
