@@ -6,9 +6,15 @@ An Open Source Player for WebChimera.js (libvlc binding for node.js/io.js/NW.js/
 
 **Install**
 - ``npm install wcjs-player``
-- ``npm install wcjs-prebuilt`` **OR** ``npm install webchimera.js`` (second one will build `WebChimera.js.node`, [prerequisites](https://github.com/RSATom/WebChimera.js#build-prerequisites))
+- ``npm install wcjs-prebuilt`` ([configuration](https://github.com/Ivshti/wcjs-prebuilt#configuration))
 
-_alternatively, you could not use `wcjs-prebuilt` or `webchimera.js`, but implement a post install script or a grunt task that fetches the correct package from [the prebuilts](https://github.com/RSATom/WebChimera.js/releases)_
+  **OR**
+
+  ``npm install webchimera.js`` (will build `WebChimera.js.node`, [prerequisites](https://github.com/RSATom/WebChimera.js#build-prerequisites))
+
+  **OR**
+
+  not use `wcjs-prebuilt` or `webchimera.js`, but implement a post install script or a grunt task that fetches the correct package from [the prebuilts](https://github.com/RSATom/WebChimera.js/releases)
 
 **Docs**
 - [JavaScript API Docs](https://github.com/jaruba/wcjs-player/wiki/JavaScript-API)
