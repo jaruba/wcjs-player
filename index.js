@@ -817,8 +817,10 @@ wjs.prototype.volume = function(newVolume) {
             this.vlc.mute = true;
         }
         this.find(".wcp-vol-bar-full").css("width", "0px");
-    } else if (newVolume && !isNaN(newVolume) && newVolume > 5 && newVolume <= 200) {
+    } else if (newVolume && !isNaN(newVolume) && newVolume > 0 && newVolume <= 200) {
         if (this.vlc.mute) this.vlc.mute = false;
+
+        if(newVolume > 200) newVolume = 200;
 
         if (newVolume > 150) this.find(".wcp-vol-button").removeClass("wcp-mute").removeClass("wcp-volume-medium").removeClass("wcp-volume-low").addClass("wcp-volume-high");
         else if (newVolume > 50) this.find(".wcp-vol-button").removeClass("wcp-mute").removeClass("wcp-volume-high").removeClass("wcp-volume-low").addClass("wcp-volume-medium");
