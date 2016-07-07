@@ -2,7 +2,7 @@
 {
     "name": "wcjs-player",
     "description": "Player for WebChimera.js (libvlc wrapper)",
-    "version": "6.0.0",
+    "version": "6.0.1",
     "license" : "LGPL-2.1",
     "author": "Branza Victor-Alexandru <branza.alex@gmail.com>",
     "keywords": [
