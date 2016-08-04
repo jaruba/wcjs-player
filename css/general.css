@@ -174,6 +174,11 @@
 	padding-left: 14px;
 }
 
+.wcp-audios-item {
+	width: calc(100% - 14px);
+	padding-left: 14px;
+}
+
 .sortable-dragging {
 	cursor: -webkit-grabbing !important;
 	background-color: #3d3d3d !important;
@@ -410,6 +415,10 @@
 /* .wcp-subtitle-but { display: none } */
 .wcp-subtitle-but:before { content: "\E83A"; font-size: 23px }
 
+/* Audios Button */
+/* .wcp-audio-but { display: none } */
+.wcp-audio-but:before { content: "\E801"; font-size: 23px }
+
 /* Fullscreen Button Icons */
 .wcp-minimize:before { content: "\E805"; font-size: 24px }
 .wcp-maximize:before { content: "\E804"; font-size: 24px }
@@ -462,6 +471,20 @@
 
 /* Subtitle Text */
 .wcp-subtitle-text {
+	font-family: 'Roboto';
+	position: absolute;
+	bottom: 40px;
+	left: 0;
+	width: 100%;
+	font-size: 20px;
+	z-index: 2;
+	color: #fff;
+	text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
+	text-align: center
+}
+
+/* Audio Text */
+.wcp-audio-text {
 	font-family: 'Roboto';
 	position: absolute;
 	bottom: 40px;
