@@ -16,7 +16,7 @@
 * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
 *****************************************************************************/
 
-// WebChimera.js Player v6.0.1
+// WebChimera.js Player v0.5.8
 
 var vlcs = {},
     opts = {},
@@ -70,7 +70,7 @@ window.addEventListener('beforeunload', function(e) {
 
 function wjs(context) {
 
-    this.version = "v6.0.1";
+    this.version = "v0.5.8";
 
     // Save the context
     this.context = (typeof context === "undefined") ? "#webchimera" : context;  // if no playerid set, default to "webchimera"
@@ -220,8 +220,6 @@ wjs.prototype.prev = function() {
 
 wjs.prototype.addPlayer = function(wcpSettings) {
 
-    if (!wcpSettings["wcjs"]) console.error(new Error('Missing `wcjs` parameter in `.addPlayer()`'));
-
     if (wcpSettings) newid = (typeof wcpSettings["id"] === "undefined") ? "webchimera" : wcpSettings["id"]; // if no id set, default to "webchimera"
     else newid = "webchimera";
 
@@ -254,10 +252,11 @@ wjs.prototype.addPlayer = function(wcpSettings) {
     opts[newid].crop = "Default";
     opts[newid].zoom = 1;
     if (typeof opts[newid].allowFullscreen === 'undefined') opts[newid].allowFullscreen = true;
-
-    playerbody = '<div' + targetid + ' style="height: 100%"><div class="wcp-center" style="overflow: hidden"><canvas class="wcp-canvas wcp-center"></canvas></div><div class="wcp-surface"></div><div class="wcp-menu wcp-playlist wcp-center"><div class="wcp-menu-close"></div><div class="wcp-menu-title">Playlist Menu</div><ul class="wcp-menu-items wcp-playlist-items"></ul></div><div class="wcp-menu wcp-subtitles wcp-center"><div class="wcp-menu-close"></div><div class="wcp-menu-title">Subtitle Menu</div><ul class="wcp-menu-items wcp-subtitles-items"></ul></div><div class="wcp-pause-anim wcp-center"><i class="wcp-anim-basic wcp-anim-icon-play"></i></div><div class="wcp-titlebar"><span class="wcp-title"></span></div><div class="wcp-toolbar"><div></div><div class="wcp-progress-bar"><div class="wcp-progress-seen"></div><div class="wcp-progress-pointer"></div></div><div class="wcp-button wcp-left wcp-prev" style="display: none"></div><div class="wcp-button wcp-left wcp-pause"></div><div class="wcp-button wcp-left wcp-next" style="display: none"></div><div class="wcp-button wcp-left wcp-vol-button wcp-volume-medium"></div><div class="wcp-vol-control"><div class="wcp-vol-bar"><div class="wcp-vol-bar-full"></div><div class="wcp-vol-bar-pointer"></div></div></div><div class="wcp-time"><span class="wcp-time-current"></span><span class="wcp-time-total"></span></div><div class="wcp-button wcp-right wcp-maximize"';
+	//sub body <div class="wcp-menu wcp-audios wcp-center"><div class="wcp-menu-close"></div><div class="wcp-menu-title">Audio menu</div><ul class="wcp-menu-items wcp-audios-items"></ul></div>
+	//line 307: toolbar button actions
+    playerbody = '<div' + targetid + ' style="height: 100%"><div class="wcp-center" style="overflow: hidden"><canvas class="wcp-canvas wcp-center"></canvas></div><div class="wcp-surface"></div><div class="wcp-menu wcp-playlist wcp-center"><div class="wcp-menu-close"></div><div class="wcp-menu-title">Playlist Menu</div><ul class="wcp-menu-items wcp-playlist-items"></ul></div><div class="wcp-menu wcp-subtitles wcp-center"><div class="wcp-menu-close"></div><div class="wcp-menu-title">Subtitle menu</div><ul class="wcp-menu-items wcp-subtitles-items"></ul></div> <div class="wcp-menu wcp-audios wcp-center"><div class="wcp-menu-close"></div><div class="wcp-menu-title">Audio menu</div><ul class="wcp-menu-items wcp-audios-items"></ul></div> <div class="wcp-pause-anim wcp-center"><i class="wcp-anim-basic wcp-anim-icon-play"></i></div><div class="wcp-titlebar"><span class="wcp-title"></span></div><div class="wcp-toolbar"><div></div><div class="wcp-progress-bar"><div class="wcp-progress-seen"></div><div class="wcp-progress-pointer"></div></div><div class="wcp-button wcp-left wcp-prev" style="display: none"></div><div class="wcp-button wcp-left wcp-pause"></div><div class="wcp-button wcp-left wcp-next" style="display: none"></div><div class="wcp-button wcp-left wcp-vol-button wcp-volume-medium"></div><div class="wcp-vol-control"><div class="wcp-vol-bar"><div class="wcp-vol-bar-full"></div><div class="wcp-vol-bar-pointer"></div></div></div><div class="wcp-time"><span class="wcp-time-current"></span><span class="wcp-time-total"></span></div><div class="wcp-button wcp-right wcp-maximize"';
     if (!opts[newid].allowFullscreen) playerbody += ' style="cursor: not-allowed; color: rgba(123,123,123,0.6);"';
-    playerbody += '></div><div class="wcp-button wcp-right wcp-playlist-but"></div><div class="wcp-button wcp-right wcp-subtitle-but"></div></div><div class="wcp-status"></div><div class="wcp-notif"></div><div class="wcp-subtitle-text"></div><div class="wcp-tooltip"><div class="wcp-tooltip-arrow"></div><div class="wcp-tooltip-inner">00:00</div></div></div>';
+    playerbody += '></div><div class="wcp-button wcp-right wcp-playlist-but"></div><div class="wcp-button wcp-right wcp-subtitle-but"></div><div class="wcp-button wcp-right wcp-audio-but"></div></div><div class="wcp-status"></div><div class="wcp-notif"></div><div class="wcp-subtitle-text"></div><div class="wcp-tooltip"><div class="wcp-tooltip-arrow"></div><div class="wcp-tooltip-inner">00:00</div></div></div>';
 
     opts[newid].currentSub = 0;
     opts[newid].trackSub = -1;
@@ -294,6 +293,8 @@ wjs.prototype.addPlayer = function(wcpSettings) {
             $(this).parents(".wcp-wrapper").find(".wcp-playlist").hide(0);
         } else if ($(this).parents(".wcp-wrapper").find(".wcp-subtitles").is(":visible")) {
             $(this).parents(".wcp-wrapper").find(".wcp-subtitles").hide(0);
+        } else if ($(this).parents(".wcp-wrapper").find(".wcp-audios").is(":visible")) {
+            $(this).parents(".wcp-wrapper").find(".wcp-audios").hide(0);
         }
     });
 
@@ -309,6 +310,10 @@ wjs.prototype.addPlayer = function(wcpSettings) {
         if (buttonClass == "wcp-subtitle-but") {
             if ($(this).parents(".wcp-wrapper").find(".wcp-subtitles").is(":visible")) hideSubtitles.call(wjsPlayer);
             else showSubtitles.call(wjsPlayer);
+        }
+		if (buttonClass == "wcp-audio-but") {
+            if ($(this).parents(".wcp-wrapper").find(".wcp-audios").is(":visible")) hideAudios.call(wjsPlayer);
+            else showAudios.call(wjsPlayer);
         }
         if (buttonClass == "wcp-prev") wjsPlayer.prev();
         else if (buttonClass == "wcp-next") wjsPlayer.next();
@@ -446,8 +451,8 @@ wjs.prototype.addPlayer = function(wcpSettings) {
         if (!checkBuffer) wcpSettings["vlcArgs"].push("--network-caching="+wcpSettings["buffer"]);
     }
 
-    vlcs[newid].vlc = wcpSettings["wcjs"].createPlayer(wcpSettings && wcpSettings["vlcArgs"] ? wcpSettings["vlcArgs"] : null )
-    vlcs[newid].renderer.bind(wjs(newid).canvas, vlcs[newid].vlc, wcpSettings["wcjsRendererOptions"] || null);
+    if (wcpSettings && wcpSettings["vlcArgs"]) vlcs[newid].vlc = vlcs[newid].renderer.init(wjs(newid).canvas,wcpSettings["vlcArgs"],wcpSettings["wcjsRendererOptions"],wcpSettings["wcjs"]);
+    else vlcs[newid].vlc = vlcs[newid].renderer.init(wjs(newid).canvas);
 
     vlcs[newid].vlc.events.on("FrameSetup",function(i) {
         return function(width, height, pixelFormat, videoFrame) {
@@ -747,15 +752,85 @@ wjs.prototype.subDelay = function(newDelay) {
     return this;
 }
 
-wjs.prototype.audioTrack = function(newTrack) {
-    if (typeof newTrack === 'number') this.vlc.audio.track = newTrack;
-    else return this.vlc.audio.track;
-    return this;
-}
+
 wjs.prototype.audioDesc = function(getDesc) {
-    if (typeof getDesc === 'number') return this.vlc.audio[getDesc];
+    if (!isNaN(getDesc)) {
+        if (getDesc < this.vlc.audio.count) {
+            wjsResponse = {};
+            wjsResponse.language = this.vlc.audio[getDesc];
+            wjsResponse.type = "internal";
+            return wjsResponse;
+        } else {
+            var itemSetting = this.itemDesc(this.currentItem()).setting;
+            if (itemSetting.audios) {
+                itemAudios = itemSetting.audios;
+                wjsIndex = this.vlc.audio.count;
+                if (wjsIndex == 0) wjsIndex = 1;
+                for (var newDesc in itemAudios) if (itemAudios.hasOwnProperty(newDesc)) {
+                    if (getDesc == wjsIndex) {
+                        wjsResponse = {};
+                        wjsResponse.language = newDesc;
+                        wjsResponse.type = "external";
+                        wjsResponse.url = itemAudios[newDesc];
+                        wjsResponse.ext = itemAudios[newDesc].split('.').pop().toLowerCase();
+                        if (wjsResponse.ext.indexOf('[') > -1) wjsResponse.ext = wjsResponse.ext.substr(0,wjsResponse.ext.indexOf('['));
+                        return wjsResponse;
+                    }
+                    wjsIndex++;
+                }
+                return;
+            }
+        }
+        return;
+    } else return console.error("Value sent to .audDesc() needs to be a number.");
+}
+
+wjs.prototype.audioCount = function() {
+    wjsIndex = this.vlc.audio.count;
+    var itemSetting = this.itemDesc(this.currentItem()).setting;
+    if (itemSetting.audios) {
+        itemAudios = itemSetting.audios;
+        if (wjsIndex == 0) wjsIndex = 1;
+        for (var newDesc in itemAudios) if (itemAudios.hasOwnProperty(newDesc)) wjsIndex++;
+        return wjsIndex;
+    }
+    return wjsIndex;
+}
+wjs.prototype.audioTrack = function(newTrack) {
+    if (typeof newTrack === 'number') {
+        if (newTrack == 0) {
+            this.vlc.audio.track = 0;
+            //clearAudios.call(this);
+        } else {
+            if (newTrack < this.vlc.audios.count) {
+                this.find(".wcp-audio-text").html("");
+                opts[this.context].audios = [];
+                this.vlc.audio.track = newTrack;
+            } else {
+                this.find(".wcp-audio-text").html("");
+                opts[this.context].audios = [];
+
+                if (this.vlc.audio.track > 0) {
+                    this.vlc.audio.track = 0;
+                    newAud = newTrack - this.vlc.audio.count +1;
+                } else newSub = newTrack - this.vlc.audio.count;
+
+                itemAudios = this.itemDesc(this.currentItem()).setting.audios;
+                for (var k in itemAudios) if (itemAudios.hasOwnProperty(k)) {
+                    newAud--;
+                    if (newAud == 0) {
+                        //loadSubtitle.call(this,itemSubtitles[k]);
+                        break;
+                    }
+                }
+            }
+            opts[this.context].currentAud = newTrack;
+            //printAudios.call(this);
+        }
+    } else return opts[this.context].currentAud;
     return this;
 }
+
 wjs.prototype.audioDelay = function(newDelay) {
     if (typeof newDelay === 'number') this.vlc.audio.delay = newDelay;
     else return this.vlc.audio.delay;
@@ -817,10 +892,8 @@ wjs.prototype.volume = function(newVolume) {
             this.vlc.mute = true;
         }
         this.find(".wcp-vol-bar-full").css("width", "0px");
-    } else if (newVolume && !isNaN(newVolume) && newVolume > 0 && newVolume <= 200) {
+    } else if (newVolume && !isNaN(newVolume) && newVolume > 5 && newVolume <= 200) {
         if (this.vlc.mute) this.vlc.mute = false;
-
-        if(newVolume > 200) newVolume = 200;
 
         if (newVolume > 150) this.find(".wcp-vol-button").removeClass("wcp-mute").removeClass("wcp-volume-medium").removeClass("wcp-volume-low").addClass("wcp-volume-high");
         else if (newVolume > 50) this.find(".wcp-vol-button").removeClass("wcp-mute").removeClass("wcp-volume-high").removeClass("wcp-volume-low").addClass("wcp-volume-medium");
@@ -1166,6 +1239,13 @@ wjs.prototype.subtitles = function(newBool) {
     } else return this.find(".wcp-subtitles")[0];
 }
 
+wjs.prototype.audios = function(newBool) {
+    if (typeof newBool !== 'undefined') {
+        if (newBool === true) return showAudios.call(this);
+        else return hideAudios.call(this);
+    } else return this.find(".wcp-audios")[0];
+}
+
 wjs.prototype.ui = function(newBool) {
     if (typeof newBool !== 'undefined') {
         if (newBool === true) {
@@ -1236,11 +1316,6 @@ function fullscreenOn() {
 
         switchClass(this.find(".wcp-maximize"),"wcp-maximize","wcp-minimize");
 
-        var that = this;
-        setTimeout(function() {
-            singleResize.call(that, that.canvas.width, that.canvas.height);
-        }, 200);
-
         return true;
     } else return false;
 }
@@ -1268,12 +1343,6 @@ function fullscreenOff() {
             this.wrapper.css({cursor: 'pointer'});
             if (!this.vlc.mute) this.vlc.mute = true;
         }
-
-        var that = this;
-        setTimeout(function() {
-            singleResize.call(that, that.canvas.width, that.canvas.height);
-        }, 200);
-
         return true;
     } else return false;
 }
@@ -1339,10 +1408,13 @@ function isMediaChanged() {
     this.find(".wcp-subtitle-text").html("");
     if (this.find(".wcp-subtitles").is(":visible")) this.find(".wcp-subtitles").hide(0);
     this.find(".wcp-subtitle-but").hide(0);
+	
+	if (this.find(".wcp-audios").is(":visible")) this.find(".wcp-audios").hide(0);
+    this.find(".wcp-audio-but").hide(0);
 
     opts[this.context].firstTime = true;
 
-    vlcs[this.context].renderer.clear(this.canvas);
+    vlcs[this.context].renderer.clearCanvas();
 }
 
 function isBuffering(percent) {
@@ -1370,6 +1442,7 @@ function isPlaying() {
         opts[this.context].currentSub = 0;
         opts[this.context].trackSub = -1;
         totalSubs = this.vlc.subtitles.count;
+		totalAudios = this.vlc.subtitles.count-1;
         itemSetting = this.itemDesc(this.currentItem()).setting;
 
         // set default aspect ratio
@@ -1398,6 +1471,7 @@ function isPlaying() {
         opts[this.context].subDelay = 0;
 
         if (totalSubs > 0) this.find(".wcp-subtitle-but").show(0);
+		if (totalAudios > 0) this.find(".wcp-audio-but").show(0);
 
         vlcs[this.context].events.emit('FirstPlay');
     }
@@ -1525,7 +1599,12 @@ function hideUI() {
 
 function showPlaylist() {
     if (!this.find(".wcp-playlist").is(":visible")) {
-        if (this.find(".wcp-subtitles").is(":visible")) this.find(".wcp-subtitles").hide(0);
+        if (this.find(".wcp-subtitles").is(":visible")) { 
+			this.find(".wcp-subtitles").hide(0);
+		}
+		if (this.find(".wcp-audios").is(":visible")) { 
+			this.find(".wcp-audios").hide(0);
+		}
         this.find(".wcp-playlist").show(0);
         printPlaylist.call(this);
     }
@@ -1544,10 +1623,31 @@ function showSubtitles() {
             this.find(".wcp-playlist-items").sortable("destroy");
             this.find(".wcp-playlist").hide(0);
         }
+		if (this.find(".wcp-audios").is(":visible")) { 
+			this.find(".wcp-audios").hide(0);
+		}
         this.find(".wcp-subtitles").show(0);
         printSubtitles.call(this);
     }
 }
+
+function hideSubtitles(){if(this.find(".wcp-subtitles").is(":visible"))this.find(".wcp-subtitles").hide(0)}
+
+function showAudios() {
+    if (!this.find(".wcp-audios").is(":visible")) {
+        if (this.find(".wcp-playlist").is(":visible")) {
+            this.find(".wcp-playlist-items").sortable("destroy");
+            this.find(".wcp-playlist").hide(0);
+        }
+		if (this.find(".wcp-subtitles").is(":visible")) { 
+			this.find(".wcp-subtitles").hide(0);
+		}
+        this.find(".wcp-audios").show(0);
+        printAudios.call(this);
+    }
+}
+
+function hideAudios(){if(this.find(".wcp-audios").is(":visible"))this.find(".wcp-audios").hide(0)}
 
 function printPlaylist() {
     playlistItems = this.find(".wcp-playlist-items");
@@ -1791,6 +1891,74 @@ function processSub(srt,extension) {
     opts[this.context].trackSub = -1;
 }
 
+function printAudios() {
+    playlistItems = this.find(".wcp-audios-items");
+
+    generatePlaylist = "";
+    generatePlaylist += '<li class="wcp-menu-item wcp-audios-item';
+    if (opts[this.context].currentAud == 0) generatePlaylist += ' wcp-menu-selected';
+	generatePlaylist += '">Mute</li>';
+    if (this.vlc.audio.count > 0) {
+        for (oi = 1; oi < this.vlc.audio.count; oi++) {
+            generatePlaylist += '<li class="wcp-menu-item wcp-audios-item';
+            if (oi == opts[this.context].currentAud) generatePlaylist += ' wcp-menu-selected';
+            generatePlaylist += '">'+this.vlc.audio[oi]+'</li>';
+        }
+    } else oi = 1;
+
+    itemSetting = this.itemDesc(this.currentItem()).setting;
+
+    if (itemSetting.audios) {
+        itemAudios = itemSetting.audios;
+        for (var k in itemAudios) if (itemAudios.hasOwnProperty(k)) {
+            generatePlaylist += '<li class="wcp-menu-item wcp-audios-item';
+            if (oi == opts[this.context].currentAud) generatePlaylist += ' wcp-menu-selected';
+            generatePlaylist += '">'+k+'</li>';
+            oi++;
+        }
+    }
+
+    playlistItems.html("");
+    playlistItems.html(generatePlaylist);
+
+    if (playlistItems.outerHeight() < (oi* parseInt(playlistItems.find(".wcp-audios-item").css("height")))) {
+        playlistItems.css("cursor","pointer");
+    } else playlistItems.css("cursor","default");
+
+    this.find(".wcp-audios-item").click(function() {
+        wjsPlayer = getContext(this);
+        if ($(this).index() == 0) {
+            wjsPlayer.vlc.audio.track = 0;
+            //clearAudios.call(wjsPlayer);
+           // wjsPlayer.notify("Subtitle Unloaded");
+        } else if ($(this).index() < wjsPlayer.vlc.audio.count) {
+            wjsPlayer.find(".wcp-audio-text").html("");
+            opts[wjsPlayer.context].audios = [];
+            wjsPlayer.vlc.audio.track = $(this).index();
+            wjsPlayer.notify("Audio: "+wjsPlayer.audioDesc($(this).index()).language);
+        } else {
+            wjsPlayer.find(".wcp-audio-text").html("");
+            opts[wjsPlayer.context].audios = [];
+            if (wjsPlayer.vlc.audio.track > 0) wjsPlayer.vlc.audio.track = 0;
+            newAud = $(this).index() - wjsPlayer.vlc.audios.count;
+            if (wjsPlayer.vlc.audio.count) newAud++;
+            itemAudios = itemSetting.audios;
+            for (var k in itemAudios) if (itemAudios.hasOwnProperty(k)) {
+                newAud--;
+                if (newAud == 0) {
+                    loadAudio.call(wjsPlayer,itemAudios[k]);
+                    wjsPlayer.notify("Audio: "+k);
+                    break;
+                }
+            }
+        }
+        wjsPlayer.find(".wcp-audios").hide(0);
+        opts[wjsPlayer.context].currentAud = $(this).index();
+        opts[wjsPlayer.context].audioDelay = 0;
+    });
+
+}
+
 function preventSleep() {
     powerSaveBlocker?(!sleepId||!powerSaveBlocker.isStarted(sleepId))?sleepId=powerSaveBlocker.start('prevent-display-sleep'):false:sleep.prevent();
 }
@@ -1830,7 +1998,6 @@ function strip(s){return s.replace(/^\s+|\s+$/g,"")}
 function gcd(a,b){if(b>a){temp=a;a=b;b=temp}while(b!=0){m=a%b;a=b;b=m;}return a}
 function sel(context){return $($(this).parents(".wcp-wrapper")[0]).find(context)}
 function switchClass(el,fclass,sclass){if(el.hasClass(fclass))el.removeClass(fclass).addClass(sclass)}
-function hideSubtitles(){if(this.find(".wcp-subtitles").is(":visible"))this.find(".wcp-subtitles").hide(0)}
 wjs.prototype.audioCount=function(){return this.vlc.audio.count}
 wjs.prototype.itemCount=function(){return this.vlc.playlist.itemCount}
 wjs.prototype.playing=function(){return this.vlc.playing}
